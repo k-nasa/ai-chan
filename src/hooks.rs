@@ -2,12 +2,14 @@ use rocket::request::{FromRequest, Outcome, Request};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum GitHubEvent {
+    Issue,
     IssueComment,
     PullRequest,
 }
 
 const X_GITHUB_EVENT: &str = "X-GitHub-Event";
 
+const ISSUE_EVENT: &str = "issue";
 const ISSUE_COMMENT_EVENT: &str = "issue_comment";
 const PULL_REQUEST_EVENT: &str = "pull_request";
 
@@ -28,6 +30,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for GitHubEvent {
         };
 
         let event = match event {
+            ISSUE_EVENT => GitHubEvent::Issue,
             ISSUE_COMMENT_EVENT => GitHubEvent::IssueComment,
             PULL_REQUEST_EVENT => GitHubEvent::PullRequest,
             _ => {
