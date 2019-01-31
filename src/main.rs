@@ -8,7 +8,7 @@ use std::io::Read;
 
 #[get("/")]
 fn index() -> &'static str {
-    // 使い方を出すように変更
+    // FIXME どうせなら使い方を出したほうが良いのでは？
     "Hello, world!"
 }
 
