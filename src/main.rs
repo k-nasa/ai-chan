@@ -1,5 +1,7 @@
 #![feature(proc_macro_hygiene, decl_macro)]
+#![feature(type_alias_enum_variants)]
 
+mod hooks;
 
 use rocket::{get, post, routes, Data};
 use std::io::Read;
