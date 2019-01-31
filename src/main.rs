@@ -3,7 +3,10 @@
 
 mod hooks;
 
-use rocket::{get, post, routes, Data};
+use rocket::{
+    config::{Config, Environment, LoggingLevel},
+    get, post, routes, Data,
+};
 use std::io::Read;
 
 #[get("/")]
@@ -17,7 +20,12 @@ fn main() {
 }
 
 fn rocket() -> rocket::Rocket {
-    rocket::ignite().mount("/", routes![index, github])
+    let config = Config::build(Environment::Development)
+        .log_level(LoggingLevel::Off)
+        .finalize()
+        .unwrap();
+
+    rocket::custom(config).mount("/", routes![index, github])
 }
 
 #[post("/github", format = "application/json", data = "<payload>")]
