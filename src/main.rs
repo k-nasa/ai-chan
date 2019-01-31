@@ -24,6 +24,10 @@ fn main() {
 
     info!("===== ai-chann =====");
     info!("start server");
+    info!("address: {}", "localhost");
+    info!("listen http on port: {}", 8000);
+    info!("botname for GitHub: {}", "ai-chann");
+    info!("Server has launched from http://{}:{}", "localhost", 8000);
     info!("====================");
 
     rocket().launch();
