@@ -34,7 +34,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for GitHubEvent {
             ISSUE_COMMENT_EVENT => GitHubEvent::IssueComment,
             PULL_REQUEST_EVENT => GitHubEvent::PullRequest,
             _ => {
-                println!("{}", event); // TODO delete
+                debug!("{}", event); // TODO delete
                 return Outcome::Failure((
                     rocket::http::Status::BadRequest,
                     failure::format_err!("unsuported event"),
