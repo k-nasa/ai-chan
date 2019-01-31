@@ -1,10 +1,10 @@
 [package]
-name = "ai-chan"
-version = "0.1.0"
 authors = ["nasa <htilcs1115@gmail.com>"]
 edition = "2018"
-
+name = "ai-chan"
+version = "0.1.0"
 [dependencies]
+failure = "*"
 rocket = "*"
 rocket_contrib = "*"
 serde_json = "1.0"
