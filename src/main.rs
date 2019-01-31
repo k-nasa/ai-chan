@@ -3,6 +3,9 @@
 
 mod hooks;
 
+#[macro_use]
+extern crate log;
+
 use rocket::{
     config::{Config, Environment, LoggingLevel},
     get, post, routes, Data,
@@ -16,6 +19,13 @@ fn index() -> &'static str {
 }
 
 fn main() {
+    std::env::set_var("RUST_LOG", "ai_chan");
+    env_logger::init();
+
+    info!("===== ai-chann =====");
+    info!("start server");
+    info!("====================");
+
     rocket().launch();
 }
 
@@ -30,20 +40,20 @@ fn rocket() -> rocket::Rocket {
 
 #[post("/github", format = "application/json", data = "<payload>")]
 fn github(event: Option<hooks::GitHubEvent>, payload: Data) {
-    println!("{:?}", event); // TODO delete
+    debug!("{:?}", event); // TODO delete
 
     if event.is_none() {
-        println!("unsuported event");
+        warn!("unsuported event");
         return;
     }
 
     let mut string = String::new();
     if payload.open().read_to_string(&mut string).is_err() {
-        println!("load error");
+        error!("load error");
     }
 
     let json: serde_json::Value = serde_json::from_str(&string).unwrap_or_default();
-    println!("{:?}", json);
+    debug!("{:?}", json);
 }
 
 #[cfg(test)]
