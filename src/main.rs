@@ -20,6 +20,24 @@ fn rocket() -> rocket::Rocket {
     rocket::ignite().mount("/", routes![index, github])
 }
 
+#[post("/github", format = "application/json", data = "<payload>")]
+fn github(event: Option<hooks::GitHubEvent>, payload: Data) {
+    println!("{:?}", event); // TODO delete
+
+    if event.is_none() {
+        println!("unsuported event");
+        return;
+    }
+
+    let mut string = String::new();
+    if payload.open().read_to_string(&mut string).is_err() {
+        println!("load error");
+    }
+
+    let json: serde_json::Value = serde_json::from_str(&string).unwrap_or_default();
+    println!("{:?}", json);
+}
+
 #[cfg(test)]
 mod test {
     use super::*;

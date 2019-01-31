@@ -51,7 +51,6 @@ mod test {
     use super::*;
     use crate::*;
     use rocket::http::Header;
-    use rocket::http::Status;
     use rocket::local::Client;
 
     #[test]
