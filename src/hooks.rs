@@ -3,11 +3,13 @@ use rocket::request::{FromRequest, Outcome, Request};
 #[derive(Clone, Debug, PartialEq)]
 pub enum GitHubEvent {
     IssueComment,
+    PullRequest,
 }
 
-const X_GITHUB_EVENT: &'static str = "X-GitHub-Event";
+const X_GITHUB_EVENT: &str = "X-GitHub-Event";
 
-const ISSUE_COMMENT_EVENT: &'static str = "issue_comment";
+const ISSUE_COMMENT_EVENT: &str = "issue_comment";
+const PULL_REQUEST_EVENT: &str = "pull_request";
 
 impl<'a, 'r> FromRequest<'a, 'r> for GitHubEvent {
     type Error = failure::Error;
@@ -27,7 +29,9 @@ impl<'a, 'r> FromRequest<'a, 'r> for GitHubEvent {
 
         let event = match event {
             ISSUE_COMMENT_EVENT => GitHubEvent::IssueComment,
+            PULL_REQUEST_EVENT => GitHubEvent::PullRequest,
             _ => {
+                println!("{}", event); // TODO delete
                 return Outcome::Failure((
                     rocket::http::Status::BadRequest,
                     failure::format_err!("unsuported event"),
