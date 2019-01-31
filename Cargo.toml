@@ -6,3 +6,5 @@ edition = "2018"
 
 [dependencies]
 rocket = "*"
+rocket_contrib = "*"
+serde_json = "1.0"
