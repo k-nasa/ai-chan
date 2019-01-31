@@ -5,6 +5,40 @@ pub enum GitHubEvent {
     IssueComment,
 }
 
+const X_GITHUB_EVENT: &'static str = "X-GitHub-Event";
+
+const ISSUE_COMMENT_EVENT: &'static str = "issue_comment";
+
+impl<'a, 'r> FromRequest<'a, 'r> for GitHubEvent {
+    type Error = failure::Error;
+
+    fn from_request(request: &'a Request<'r>) -> Outcome<Self, Self::Error> {
+        let event = request.headers().get_one(X_GITHUB_EVENT);
+
+        let event = match event {
+            Some(e) => e,
+            None => {
+                return Outcome::Failure((
+                    rocket::http::Status::BadRequest,
+                    failure::format_err!("{} is not set", X_GITHUB_EVENT),
+                ));
+            }
+        };
+
+        let event = match event {
+            ISSUE_COMMENT_EVENT => GitHubEvent::IssueComment,
+            _ => {
+                return Outcome::Failure((
+                    rocket::http::Status::BadRequest,
+                    failure::format_err!("unsuported event"),
+                ));
+            }
+        };
+
+        Outcome::Success(event)
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
