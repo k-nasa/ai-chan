@@ -65,6 +65,19 @@ mod test {
     }
 
     #[test]
+    fn test_from_request_issue() {
+        let client = Client::new(rocket()).expect("valid rocket instance");
+
+        let header = Header::new("X-GitHub-Event", "issue");
+        let request = client.post("/").header(header).body("test");
+
+        let event = GitHubEvent::from_request(&request.inner());
+
+        assert!(event.is_success());
+        assert_eq!(event.unwrap(), GitHubEvent::Issue);
+    }
+
+    #[test]
     fn test_from_request_pull_request() {
         let client = Client::new(rocket()).expect("valid rocket instance");
 
