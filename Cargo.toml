@@ -11,10 +11,10 @@ edition = "2018"
 
 [dependencies]
 dirs = "*"
-env_logger = "0.6.0"
 failure = "*"
 hubcaps = "*"
 log = "*"
+pretty_env_logger = "*"
 rocket = "*"
 rocket_contrib = "*"
 serde = "*"

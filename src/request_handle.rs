@@ -22,7 +22,6 @@ pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult
         GitHubEvent::IssueComment => warn!("unimplemented"),
     }
 
-    info!("End handle event");
     Ok(())
 }
 

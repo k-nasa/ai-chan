@@ -8,6 +8,7 @@ mod test_support;
 
 #[macro_use]
 extern crate log;
+extern crate pretty_env_logger;
 
 type AIChannResult = Result<(), failure::Error>;
 
@@ -20,7 +21,7 @@ use rocket::{
 
 fn main() {
     std::env::set_var("RUST_LOG", "ai_chan");
-    env_logger::init();
+    pretty_env_logger::init();
 
     let config = match crate::config::Config::load_config() {
         Ok(c) => c,
