@@ -8,7 +8,26 @@ pub struct PullRequestEvent {
 }
 
 #[derive(Deserialize, PartialEq, Debug)]
-enum PullRequestAction {}
+enum PullRequestAction {
+    #[serde(rename = "Opened")]
+    Opened,
+    #[serde(rename = "edited")]
+    Edited,
+    #[serde(rename = "closed")]
+    Closed,
+    #[serde(rename = "assigned")]
+    Assigned,
+    #[serde(rename = "unassigned")]
+    Unassigned,
+    #[serde(rename = "review_requested")]
+    ReviewRequested,
+    #[serde(rename = "review_request_removed")]
+    ReviewRequestRemoved,
+    #[serde(rename = "labeled")]
+    Labeled,
+    #[serde(rename = "unlabeled")]
+    Unlabeled,
+}
 
 #[derive(Deserialize, PartialEq, Debug)]
 pub struct PullRequest {}
