@@ -22,12 +22,24 @@ fn main() {
     std::env::set_var("RUST_LOG", "ai_chan");
     env_logger::init();
 
+    let config = match crate::config::Config::load_config() {
+        Ok(c) => c,
+        Err(e) => {
+            error!("Failed load config file: {}", e);
+            return;
+        }
+    };
+
     info!("===== ai-chann ===================================");
     info!("start server");
-    info!("address: {}", "localhost");
-    info!("listen http on port: {}", 8000);
-    info!("botname for GitHub: {}", "ai-chann");
-    info!("Server has launched from http://{}:{}", "localhost", 8000);
+    info!("address: {}", config.address());
+    info!("listen http on port: {}", config.port());
+    info!("botname for GitHub: {}", config.botname());
+    info!(
+        "Server has launched from http://{}:{}",
+        config.address(),
+        config.port()
+    );
     info!("===================================================");
 
     rocket(config).launch();
