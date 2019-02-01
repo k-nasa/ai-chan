@@ -9,7 +9,7 @@ pub struct PullRequestEvent {
 
 #[derive(Deserialize, PartialEq, Debug)]
 enum PullRequestAction {
-    #[serde(rename = "Opened")]
+    #[serde(rename = "opened")]
     Opened,
     #[serde(rename = "edited")]
     Edited,
