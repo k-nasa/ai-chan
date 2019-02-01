@@ -1,6 +1,9 @@
+use crate::config::Config;
 use crate::github::{github_event::GitHubEvent, pull_request::PullRequestEvent};
 use crate::AIChannResult;
+use hubcaps::*;
 use rocket::Data;
+use tokio::runtime::Runtime;
 
 use std::io::Read;
 pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult {
@@ -19,12 +22,38 @@ pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult
         GitHubEvent::IssueComment => warn!("unimplemented"),
     }
 
+    info!("End handle event");
     Ok(())
 }
 
 fn handle_pull_request(json: serde_json::Value) -> AIChannResult {
+    let config = Config::load_config()?;
     let pull_request: PullRequestEvent = serde_json::from_value(json)?;
-    unimplemented!()
+
+    let github = Github::new(
+        concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
+        Credentials::Token(config.github_api_key().to_owned()),
+    );
+
+    let repo = pull_request
+        .repository
+        .full_name
+        .split("/")
+        .collect::<Vec<&str>>();
+
+    let mut rt = Runtime::new()?;
+
+    rt.block_on(
+        github
+            .repo(repo[0], repo[1])
+            .pulls()
+            .get(pull_request.number.into())
+            .assignees()
+            .add(parse_command(&pull_request.pull_request.body)),
+    )
+    .unwrap(); //FIXME unwrap()
+
+    Ok(())
 }
 
 // FIXME 可読性が低い
