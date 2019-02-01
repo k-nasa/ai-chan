@@ -31,6 +31,13 @@ enum PullRequestAction {
 
 #[derive(Deserialize, PartialEq, Debug)]
 pub struct PullRequest {}
+#[derive(Deserialize, PartialEq, Debug)]
+enum PullRequestState {
+    #[serde(rename = "open")]
+    Open,
+    #[serde(rename = "closed")]
+    Closed,
+}
 
 #[cfg(test)]
 mod test {
