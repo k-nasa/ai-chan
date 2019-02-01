@@ -2,6 +2,7 @@
 #![feature(type_alias_enum_variants)]
 
 mod github;
+mod request_handle;
 mod test_support;
 
 #[macro_use]
@@ -9,12 +10,12 @@ extern crate log;
 
 type AIChannResult = Result<(), failure::Error>;
 
-use github::{github_event::GitHubEvent, pull_request::PullRequestEvent};
+use github::github_event::GitHubEvent;
+use request_handle::handle_github_webhook;
 use rocket::{
     config::{Config, Environment, LoggingLevel},
     get, post, routes, Data,
 };
-use std::io::Read;
 
 fn main() {
     std::env::set_var("RUST_LOG", "ai_chan");
@@ -59,29 +60,6 @@ fn github(event: Result<GitHubEvent, failure::Error>, payload: Data) {
         Ok(_) => info!("Sucess request handle"),
         Err(e) => error!("Failed request handle: {}", e),
     }
-}
-
-fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult {
-    info!("Start hendle {:?} event", event);
-
-    let mut json_string = String::new();
-    if payload.open().read_to_string(&mut json_string).is_err() {
-        failure::bail!("Bad request. failed read payload.");
-    }
-
-    let payload_json: serde_json::Value = serde_json::from_str(&json_string)?;
-
-    match event {
-        GitHubEvent::PullRequest => handle_pull_request(payload_json)?,
-        GitHubEvent::Issue => warn!("unimplemented!!"),
-        GitHubEvent::IssueComment => warn!("unimplemented"),
-    }
-
-    Ok(())
-}
-
-fn handle_pull_request(json: serde_json::Value) -> AIChannResult {
-    unimplemented!()
 }
 
 #[cfg(test)]
