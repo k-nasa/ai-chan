@@ -27,6 +27,32 @@ fn handle_pull_request(json: serde_json::Value) -> AIChannResult {
     unimplemented!()
 }
 
+// FIXME 可読性が低い
+fn parse_command(body: &str) -> Vec<&str> {
+    let input: Vec<&str> = body
+        .lines()
+        // FIXME unimplemented r+
+        .filter(|l| l.contains("r?") || l.contains("r+"))
+        .collect();
+
+    if input.is_empty() {
+        return vec![];
+    }
+
+    let command_line: Vec<&str> = input[0].split_whitespace().collect();
+    let (head, tail) = command_line.split_at(1);
+
+    if Some(&"r?") != head.first() {
+        return vec![];
+    }
+
+    // TODO rifactor
+    tail.iter()
+        .filter(|a| a.starts_with('@'))
+        .map(|a| a.trim_start_matches('@'))
+        .collect()
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
