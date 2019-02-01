@@ -48,3 +48,14 @@ fn home_dir_string() -> Result<String, failure::Error> {
         _ => failure::bail!("Failed get home directory"),
     }
 }
+
+impl Default for Config {
+    fn default() -> Self {
+        Config {
+            port: 8000,
+            address: "localhost".to_owned(),
+            botname: "botname".to_owned(),
+            github_api_key: String::new(),
+        }
+    }
+}
