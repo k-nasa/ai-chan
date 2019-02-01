@@ -32,7 +32,7 @@ enum PullRequestAction {
 }
 
 #[derive(Deserialize, PartialEq, Debug)]
-pub struct PullRequest {
+struct PullRequest {
     id: u32,
     url: String,
     number: u32,
