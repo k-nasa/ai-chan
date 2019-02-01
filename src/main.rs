@@ -1,7 +1,7 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 #![feature(type_alias_enum_variants)]
 
-mod hooks;
+mod github_event;
 
 #[macro_use]
 extern crate log;
@@ -43,7 +43,7 @@ fn rocket() -> rocket::Rocket {
 }
 
 #[post("/github", format = "application/json", data = "<payload>")]
-fn github(event: Option<hooks::GitHubEvent>, payload: Data) {
+fn github(event: Option<github_event::GitHubEvent>, payload: Data) {
     debug!("{:?}", event); // TODO delete
 
     if event.is_none() {
