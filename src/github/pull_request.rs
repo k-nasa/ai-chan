@@ -30,7 +30,16 @@ enum PullRequestAction {
 }
 
 #[derive(Deserialize, PartialEq, Debug)]
-pub struct PullRequest {}
+pub struct PullRequest {
+    id: u32,
+    url: String,
+    number: u32,
+    state: PullRequestState,
+    locked: bool,
+    title: String,
+    body: String,
+}
+
 #[derive(Deserialize, PartialEq, Debug)]
 enum PullRequestState {
     #[serde(rename = "open")]
