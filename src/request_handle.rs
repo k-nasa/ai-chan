@@ -39,6 +39,7 @@ fn parse_command(body: &str) -> Vec<&str> {
         return vec![];
     }
 
+    // TODO 最初の行にr?がなくても対応できるようにしたい
     let command_line: Vec<&str> = input[0].split_whitespace().collect();
     let (head, tail) = command_line.split_at(1);
 
