@@ -7,6 +7,8 @@ mod test_support;
 #[macro_use]
 extern crate log;
 
+type AIChannResult = Result<(), failure::Error>;
+
 use github::{github_event::GitHubEvent, pull_request::PullRequestEvent};
 use rocket::{
     config::{Config, Environment, LoggingLevel},
@@ -59,7 +61,7 @@ fn github(event: Result<GitHubEvent, failure::Error>, payload: Data) {
     }
 }
 
-fn handle_github_webhook(event: GitHubEvent, payload: Data) -> Result<(), failure::Error> {
+fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult {
     info!("Start hendle {:?} event", event);
 
     let mut string = String::new();
