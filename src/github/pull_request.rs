@@ -13,6 +13,8 @@ enum PullRequestAction {
     Opened,
     #[serde(rename = "edited")]
     Edited,
+    #[serde(rename = "reopened")]
+    Reopened,
     #[serde(rename = "closed")]
     Closed,
     #[serde(rename = "assigned")]
