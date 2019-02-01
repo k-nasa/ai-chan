@@ -1,6 +1,7 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 #![feature(type_alias_enum_variants)]
 
+mod config;
 mod github;
 mod request_handle;
 mod test_support;
