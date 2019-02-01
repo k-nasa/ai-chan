@@ -29,6 +29,8 @@ enum PullRequestAction {
     Labeled,
     #[serde(rename = "unlabeled")]
     Unlabeled,
+    #[serde(rename = "synchronize")]
+    Synchronize,
 }
 
 #[derive(Deserialize, PartialEq, Debug)]
