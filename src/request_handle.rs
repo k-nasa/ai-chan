@@ -3,9 +3,9 @@ use crate::github::{github_event::GitHubEvent, pull_request::PullRequestEvent};
 use crate::AIChannResult;
 use hubcaps::*;
 use rocket::Data;
+use std::io::Read;
 use tokio::runtime::Runtime;
 
-use std::io::Read;
 pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult {
     info!("Start hendle {:?} event", event);
 
@@ -27,28 +27,34 @@ pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult
 
 fn handle_pull_request(json: serde_json::Value) -> AIChannResult {
     let config = Config::load_config()?;
-    let pull_request: PullRequestEvent = serde_json::from_value(json)?;
+    let pull_request_event: PullRequestEvent = serde_json::from_value(json)?;
+
+    let assignees = parse_command(&pull_request_event.pull_request.body);
+
+    if assignees.is_empty() {
+        warn!("Not Found valid command");
+        return Ok(());
+    }
+
+    let repo = pull_request_event
+        .repository
+        .full_name
+        .split('/')
+        .collect::<Vec<&str>>();
 
     let github = Github::new(
         concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
         Credentials::Token(config.github_api_key().to_owned()),
     );
 
-    let repo = pull_request
-        .repository
-        .full_name
-        .split("/")
-        .collect::<Vec<&str>>();
-
     let mut rt = Runtime::new()?;
-
     rt.block_on(
         github
             .repo(repo[0], repo[1])
             .pulls()
-            .get(pull_request.number.into())
+            .get(pull_request_event.number.into())
             .assignees()
-            .add(parse_command(&pull_request.pull_request.body)),
+            .add(assignees),
     )
     .unwrap(); //FIXME unwrap()
 

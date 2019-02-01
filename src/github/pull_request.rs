@@ -78,7 +78,7 @@ mod test {
             action: PullRequestAction::Closed,
             number: 1,
             repository: Repository {
-                id: 135493233,
+                id: 135_493_233,
                 name: "Hello-World".to_owned(),
                 full_name: "Codertocat/Hello-World".to_owned(),
             },
