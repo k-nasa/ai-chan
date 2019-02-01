@@ -70,4 +70,17 @@ mod test {
 
         assert_eq!(parse_command(&body), vec!["k-nasa", "k-nasa2"]);
     }
+
+    #[test]
+    fn test_parse_command_when_invalid() {
+        let body1 = "r? ";
+        let body2 = "@hoge r?";
+        let body3 = "";
+        let body4 = "hogehoge";
+
+        assert_eq!(parse_command(&body1), Vec::<&str>::new());
+        assert_eq!(parse_command(&body2), Vec::<&str>::new());
+        assert_eq!(parse_command(&body3), Vec::<&str>::new());
+        assert_eq!(parse_command(&body4), Vec::<&str>::new());
+    }
 }
