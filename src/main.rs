@@ -14,7 +14,7 @@ type AIChannResult = Result<(), failure::Error>;
 use github::github_event::GitHubEvent;
 use request_handle::handle_github_webhook;
 use rocket::{
-    config::{Config, Environment, LoggingLevel},
+    config::{Environment, LoggingLevel},
     get, post, routes, Data,
 };
 
@@ -30,11 +30,13 @@ fn main() {
     info!("Server has launched from http://{}:{}", "localhost", 8000);
     info!("===================================================");
 
-    rocket().launch();
+    rocket(config).launch();
 }
 
-fn rocket() -> rocket::Rocket {
-    let config = Config::build(Environment::Development)
+fn rocket(config: crate::config::Config) -> rocket::Rocket {
+    let config = rocket::config::Config::build(Environment::Development)
+        .address(config.address())
+        .port(*config.port() as u16)
         .log_level(LoggingLevel::Off)
         .finalize()
         .unwrap();
@@ -66,12 +68,13 @@ fn github(event: Result<GitHubEvent, failure::Error>, payload: Data) {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::config::Config;
     use rocket::http::Status;
     use rocket::local::Client;
 
     #[test]
     fn test_index() {
-        let client = Client::new(rocket()).expect("valid rocket instance");
+        let client = Client::new(rocket(Config::default())).expect("valid rocket instance");
 
         let mut response = client.get("/").dispatch();
         assert_eq!(response.status(), Status::Ok);
