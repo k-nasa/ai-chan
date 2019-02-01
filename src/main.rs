@@ -1,11 +1,13 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 #![feature(type_alias_enum_variants)]
 
-mod github_event;
+mod github;
+mod test_support;
 
 #[macro_use]
 extern crate log;
 
+use github::{github_event::GitHubEvent, pull_request::PullRequestEvent};
 use rocket::{
     config::{Config, Environment, LoggingLevel},
     get, post, routes, Data,
@@ -43,7 +45,7 @@ fn rocket() -> rocket::Rocket {
 }
 
 #[post("/github", format = "application/json", data = "<payload>")]
-fn github(event: Result<github_event::GitHubEvent, failure::Error>, payload: Data) {
+fn github(event: Result<GitHubEvent, failure::Error>, payload: Data) {
     if let Err(e) = event {
         warn!("{}", e);
         return;
@@ -56,8 +58,8 @@ fn github(event: Result<github_event::GitHubEvent, failure::Error>, payload: Dat
         error!("load error");
     }
 
-    let json: serde_json::Value = serde_json::from_str(&string).unwrap_or_default();
-    // debug!("{:?}", json);
+    let pr_event: PullRequestEvent = serde_json::from_str(&string).unwrap();
+    debug!("{:?}", pr_event);
 }
 
 #[cfg(test)]
