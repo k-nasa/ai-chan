@@ -64,9 +64,9 @@ fn github(event: Result<GitHubEvent, failure::Error>, payload: Data) {
 fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult {
     info!("Start hendle {:?} event", event);
 
-    let mut string = String::new();
-    if payload.open().read_to_string(&mut string).is_err() {
-        error!("load error");
+    let mut json_string = String::new();
+    if payload.open().read_to_string(&mut json_string).is_err() {
+        failure::bail!("Bad request. failed read payload.");
     }
 
     let pr_event: PullRequestEvent = serde_json::from_str(&string).unwrap();
