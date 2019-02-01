@@ -1,8 +1,14 @@
 [package]
-authors = ["nasa <htilcs1115@gmail.com>"]
-edition = "2018"
 name = "ai-chan"
 version = "0.1.0"
+authors = ["nasa <htilcs1115@gmail.com>"]
+keywords = ["github-bot"]
+license-file = "LICENSE"
+readme = "README.md"
+repository = "https://github.com/k-nasa/ai-chan"
+description = "A helpful operation bot for GitHub. This helps to assign a reviewer, to merge a pull request, and to notify an unmergeable pull request with a comment as a command interactively."
+edition = "2018"
+
 [dependencies]
 dirs = "*"
 env_logger = "0.6.0"
