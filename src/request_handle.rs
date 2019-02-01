@@ -26,3 +26,22 @@ fn handle_pull_request(json: serde_json::Value) -> AIChannResult {
     let pull_request: PullRequestEvent = serde_json::from_value(json)?;
     unimplemented!()
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_parse_command() {
+        let body = "r? @k-nasa";
+
+        assert_eq!(parse_command(&body), vec!["k-nasa"]);
+    }
+
+    #[test]
+    fn test_parse_command_when_many_assignees() {
+        let body = "r? @k-nasa @k-nasa2";
+
+        assert_eq!(parse_command(&body), vec!["k-nasa", "k-nasa2"]);
+    }
+}
