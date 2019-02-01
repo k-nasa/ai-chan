@@ -24,13 +24,13 @@ fn main() {
     std::env::set_var("RUST_LOG", "ai_chan");
     env_logger::init();
 
-    info!("===== ai-chann =====");
+    info!("===== ai-chann ===================================");
     info!("start server");
     info!("address: {}", "localhost");
     info!("listen http on port: {}", 8000);
     info!("botname for GitHub: {}", "ai-chann");
     info!("Server has launched from http://{}:{}", "localhost", 8000);
-    info!("====================");
+    info!("===================================================");
 
     rocket().launch();
 }
