@@ -16,12 +16,6 @@ use rocket::{
 };
 use std::io::Read;
 
-#[get("/")]
-fn index() -> &'static str {
-    // FIXME どうせなら使い方を出したほうが良いのでは？
-    "Hello, world!"
-}
-
 fn main() {
     std::env::set_var("RUST_LOG", "ai_chan");
     env_logger::init();
@@ -44,6 +38,12 @@ fn rocket() -> rocket::Rocket {
         .unwrap();
 
     rocket::custom(config).mount("/", routes![index, github])
+}
+
+#[get("/")]
+fn index() -> &'static str {
+    // FIXME どうせなら使い方を出したほうが良いのでは？
+    "Hello, world!"
 }
 
 #[post("/github", format = "application/json", data = "<payload>")]
