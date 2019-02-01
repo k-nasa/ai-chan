@@ -69,10 +69,19 @@ fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult {
         failure::bail!("Bad request. failed read payload.");
     }
 
-    let pr_event: PullRequestEvent = serde_json::from_str(&string).unwrap();
-    debug!("{:?}", pr_event);
+    let payload_json: serde_json::Value = serde_json::from_str(&json_string)?;
+
+    match event {
+        GitHubEvent::PullRequest => handle_pull_request(payload_json)?,
+        GitHubEvent::Issue => warn!("unimplemented!!"),
+        GitHubEvent::IssueComment => warn!("unimplemented"),
+    }
 
     Ok(())
+}
+
+fn handle_pull_request(json: serde_json::Value) -> AIChannResult {
+    unimplemented!()
 }
 
 #[cfg(test)]
