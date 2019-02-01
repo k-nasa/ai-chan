@@ -1,14 +1,18 @@
 use serde_derive::*;
 
+// XXX 全部pubにしてしまったのでいい感じにする
+
 #[derive(Deserialize, PartialEq, Debug)]
 pub struct PullRequestEvent {
-    action: PullRequestAction,
-    number: u32,
-    pull_request: PullRequest,
+    // XXX add getter
+    pub action: PullRequestAction,
+    pub number: u32,
+    pub pull_request: PullRequest,
+    pub repository: Repository,
 }
 
 #[derive(Deserialize, PartialEq, Debug)]
-enum PullRequestAction {
+pub enum PullRequestAction {
     #[serde(rename = "opened")]
     Opened,
     #[serde(rename = "edited")]
@@ -34,18 +38,26 @@ enum PullRequestAction {
 }
 
 #[derive(Deserialize, PartialEq, Debug)]
-struct PullRequest {
-    id: u32,
-    url: String,
-    number: u32,
-    state: PullRequestState,
-    locked: bool,
-    title: String,
-    body: String,
+pub struct PullRequest {
+    pub id: u32,
+    pub url: String,
+    pub number: u32,
+    pub state: PullRequestState,
+    pub locked: bool,
+    pub title: String,
+    pub body: String,
 }
 
 #[derive(Deserialize, PartialEq, Debug)]
-enum PullRequestState {
+pub struct Repository {
+    // XXX add getter
+    pub id: u32,
+    pub name: String,
+    pub full_name: String,
+}
+
+#[derive(Deserialize, PartialEq, Debug)]
+pub enum PullRequestState {
     #[serde(rename = "open")]
     Open,
     #[serde(rename = "closed")]
@@ -65,6 +77,11 @@ mod test {
         let event2 = PullRequestEvent {
             action: PullRequestAction::Closed,
             number: 1,
+            repository: Repository {
+                id: 135493233,
+                name: "Hello-World".to_owned(),
+                full_name: "Codertocat/Hello-World".to_owned(),
+            },
             pull_request: PullRequest {
                 id: 1,
                 url: "https://api.github.com/repos/Codertocat/Hello-World/pulls/1".to_owned(),

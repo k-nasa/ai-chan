@@ -48,13 +48,14 @@ impl<'a, 'r> FromRequest<'a, 'r> for GitHubEvent {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::config::Config;
     use crate::*;
     use rocket::http::Header;
     use rocket::local::Client;
 
     #[test]
     fn test_from_request_issue_comment() {
-        let client = Client::new(rocket()).expect("valid rocket instance");
+        let client = Client::new(rocket(Config::default())).expect("valid rocket instance");
 
         let header = Header::new("X-GitHub-Event", "issue_comment");
         let request = client.post("/").header(header).body("test");
@@ -67,7 +68,7 @@ mod test {
 
     #[test]
     fn test_from_request_issue() {
-        let client = Client::new(rocket()).expect("valid rocket instance");
+        let client = Client::new(rocket(Config::default())).expect("valid rocket instance");
 
         let header = Header::new("X-GitHub-Event", "issue");
         let request = client.post("/").header(header).body("test");
@@ -80,7 +81,7 @@ mod test {
 
     #[test]
     fn test_from_request_pull_request() {
-        let client = Client::new(rocket()).expect("valid rocket instance");
+        let client = Client::new(rocket(Config::default())).expect("valid rocket instance");
 
         let header = Header::new("X-GitHub-Event", "pull_request");
         let request = client.post("/").header(header).body("test");
