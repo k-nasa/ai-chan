@@ -5,6 +5,7 @@ pub struct PullRequestEvent {
     action: PullRequestAction,
     number: u32,
     pull_request: PullRequest,
+    repository: Repository,
 }
 
 #[derive(Deserialize, PartialEq, Debug)]
@@ -45,6 +46,13 @@ struct PullRequest {
 }
 
 #[derive(Deserialize, PartialEq, Debug)]
+struct Repository {
+    id: u32,
+    name: String,
+    full_name: String,
+}
+
+#[derive(Deserialize, PartialEq, Debug)]
 enum PullRequestState {
     #[serde(rename = "open")]
     Open,
@@ -65,6 +73,11 @@ mod test {
         let event2 = PullRequestEvent {
             action: PullRequestAction::Closed,
             number: 1,
+            repository: Repository {
+                id: 135493233,
+                name: "Hello-World".to_owned(),
+                full_name: "Codertocat/Hello-World".to_owned(),
+            },
             pull_request: PullRequest {
                 id: 1,
                 url: "https://api.github.com/repos/Codertocat/Hello-World/pulls/1".to_owned(),
