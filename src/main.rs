@@ -43,13 +43,13 @@ fn rocket() -> rocket::Rocket {
 }
 
 #[post("/github", format = "application/json", data = "<payload>")]
-fn github(event: Option<github_event::GitHubEvent>, payload: Data) {
-    debug!("{:?}", event); // TODO delete
-
-    if event.is_none() {
-        warn!("unsuported event");
+fn github(event: Result<github_event::GitHubEvent, failure::Error>, payload: Data) {
+    if let Err(e) = event {
+        warn!("{}", e);
         return;
     }
+
+    info!("get {:?} event", event.unwrap());
 
     let mut string = String::new();
     if payload.open().read_to_string(&mut string).is_err() {
@@ -57,7 +57,7 @@ fn github(event: Option<github_event::GitHubEvent>, payload: Data) {
     }
 
     let json: serde_json::Value = serde_json::from_str(&string).unwrap_or_default();
-    debug!("{:?}", json);
+    // debug!("{:?}", json);
 }
 
 #[cfg(test)]
