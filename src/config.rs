@@ -26,6 +26,20 @@ impl Config {
 
         Ok(config)
     }
+
+    pub fn port(&self) -> &u32 {
+        &self.port
+    }
+
+    pub fn address(&self) -> &str {
+        &self.address
+    }
+    pub fn botname(&self) -> &str {
+        &self.botname
+    }
+    pub fn github_api_key(&self) -> &str {
+        &self.github_api_key
+    }
 }
 
 fn home_dir_string() -> Result<String, failure::Error> {
