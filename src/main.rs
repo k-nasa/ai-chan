@@ -51,7 +51,16 @@ fn github(event: Result<GitHubEvent, failure::Error>, payload: Data) {
         return;
     }
 
-    info!("get {:?} event", event.unwrap());
+    let result = handle_github_webhook(event.unwrap(), payload);
+
+    match result {
+        Ok(_) => info!("Sucess request handle"),
+        Err(e) => error!("Failed request handle: {}", e),
+    }
+}
+
+fn handle_github_webhook(event: GitHubEvent, payload: Data) -> Result<(), failure::Error> {
+    info!("Start hendle {:?} event", event);
 
     let mut string = String::new();
     if payload.open().read_to_string(&mut string).is_err() {
@@ -60,6 +69,8 @@ fn github(event: Result<GitHubEvent, failure::Error>, payload: Data) {
 
     let pr_event: PullRequestEvent = serde_json::from_str(&string).unwrap();
     debug!("{:?}", pr_event);
+
+    Ok(())
 }
 
 #[cfg(test)]
