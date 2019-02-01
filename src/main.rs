@@ -7,7 +7,7 @@ mod test_support;
 #[macro_use]
 extern crate log;
 
-use github::github_event::GitHubEvent;
+use github::{github_event::GitHubEvent, pull_request::PullRequestEvent};
 use rocket::{
     config::{Config, Environment, LoggingLevel},
     get, post, routes, Data,
@@ -58,8 +58,8 @@ fn github(event: Result<GitHubEvent, failure::Error>, payload: Data) {
         error!("load error");
     }
 
-    let json: serde_json::Value = serde_json::from_str(&string).unwrap_or_default();
-    // debug!("{:?}", json);
+    let pr_event: PullRequestEvent = serde_json::from_str(&string).unwrap();
+    debug!("{:?}", pr_event);
 }
 
 #[cfg(test)]
