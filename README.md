@@ -37,7 +37,7 @@ This is an operation bot to do these things automatically for your project on Gi
 2.Create config file
 
 - Read the config file of this path (~/.config/ai-chan/config.toml)
-- Let's cofy from [config.toml](https://github.com/k-nasa/ai-chan/blob/master/example.config.toml)
+- Let's copy from [example.config.toml](https://github.com/k-nasa/ai-chan/blob/master/example.config.toml)
 
 3.Start the exec binary
 
