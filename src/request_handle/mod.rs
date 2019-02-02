@@ -155,4 +155,17 @@ mod test {
 
         assert_eq!(parse_command(&body).unwrap(), commands);
     }
+
+    #[test]
+    fn test_parse_command_when_invalid_comment() {
+        let body1 = "r+";
+        let body2 = "r+ @hogehgeo";
+        let body3 = "";
+        let body4 = "hogehoge";
+
+        assert!(parse_command(&body1).is_err());
+        assert!(parse_command(&body2).is_err());
+        assert!(parse_command(&body3).is_err());
+        assert!(parse_command(&body4).is_err());
+    }
 }
