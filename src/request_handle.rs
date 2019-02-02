@@ -107,6 +107,20 @@ mod test {
     }
 
     #[test]
+    fn test_parse_command_when_many_input() {
+        let body = r###"
+            This pr is hogehogheo.
+            r? @k-nasa
+
+            I think hogehogheo.
+
+            r? @k-nasa2
+            "###;
+
+        assert_eq!(parse_command(&body), vec!["k-nasa"]);
+    }
+
+    #[test]
     fn test_parse_command_when_invalid() {
         let body1 = "r? ";
         let body2 = "@hoge r?";
