@@ -17,7 +17,7 @@ This is an operation bot to do these things automatically for your project on Gi
 
 ### ```r? @<reviewer>```
 
-- You can call r? @<reviewer1> @<reviewer2> to assign multiple reviewers
+- You can call `r? @<reviewer1> @<reviewer2>` to assign multiple reviewers
 - All user can call this command.
 
 ### ```@<botname> r+```
