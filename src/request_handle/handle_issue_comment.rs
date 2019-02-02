@@ -45,13 +45,14 @@ fn merge_repository(issue_comment_event: IssueCommentEvent) -> AIChannResult {
     );
 
     let mut rt = Runtime::new()?;
-    let merge = rt.block_on(
+    rt.block_on(
         github
             .repo(repo[0], repo[1])
             .pulls()
             .get(issue_comment_event.issue.number.into())
             .merge(),
-    );
+    )
+    .unwrap();
 
     Ok(())
 }

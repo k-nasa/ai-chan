@@ -82,7 +82,7 @@ fn parse_command(body: &str) -> Result<Commands, failure::Error> {
     }
 
     if let Some(botname) = head.first() {
-        if !botname.starts_with("@") {
+        if !botname.starts_with('@') {
             failure::bail!("Not Found valid command")
         }
 
