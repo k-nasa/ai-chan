@@ -24,7 +24,7 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
         failure::bail!("Faild parse command");
     }
 
-    let assignees = user_assign.unwrap().assignees;
+    let assignees = user_assign.unwrap();
 
     add_assignees(&pull_request_event, &assignees)?;
 

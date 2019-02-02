@@ -25,31 +25,29 @@ pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult
     Ok(())
 }
 
+type BotName = String;
+type Assignees = Vec<String>;
+
 #[derive(PartialEq, Debug)]
 enum Commands {
-    ApprovalPR,
-    UserAssign(UserAssign),
+    ApprovalPR(BotName),
+    UserAssign(Assignees),
 }
 
 impl Commands {
-    pub fn user_assign(self) -> Option<UserAssign> {
+    pub fn user_assign(self) -> Option<Assignees> {
         match self {
             Commands::UserAssign(u) => Some(u),
             _ => None,
         }
     }
 
-    pub fn approval_pr(&self) -> Option<()> {
+    pub fn approval_pr(self) -> Option<BotName> {
         match self {
-            Commands::ApprovalPR => Some(()),
+            Commands::ApprovalPR(b) => Some(b),
             _ => None,
         }
     }
-}
-
-#[derive(PartialEq, Debug)]
-struct UserAssign {
-    pub assignees: Vec<String>,
 }
 
 // FIXME 可読性が低い
@@ -80,7 +78,7 @@ fn parse_command(body: &str) -> Result<Commands, failure::Error> {
             failure::bail!("Not Found username")
         }
 
-        return Ok(Commands::UserAssign(UserAssign { assignees }));
+        return Ok(Commands::UserAssign(assignees));
     }
 
     failure::bail!("Not Found valid command")
@@ -91,11 +89,9 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_parse_command() {
+    fn test_parse_command_pr_event() {
         let body = "r? @k-nasa";
-        let commands = Commands::UserAssign(UserAssign {
-            assignees: vec!["k-nasa".to_string()],
-        });
+        let commands = Commands::UserAssign(vec!["k-nasa".to_string()]);
 
         assert_eq!(parse_command(&body).unwrap(), commands);
     }
@@ -103,9 +99,7 @@ mod test {
     #[test]
     fn test_parse_command_when_many_assignees() {
         let body = "r? @k-nasa @k-nasa2";
-        let commands = Commands::UserAssign(UserAssign {
-            assignees: vec!["k-nasa".to_string(), "k-nasa2".to_owned()],
-        });
+        let commands = Commands::UserAssign(vec!["k-nasa".to_string(), "k-nasa2".to_owned()]);
 
         assert_eq!(parse_command(&body).unwrap(), commands);
     }
@@ -121,15 +115,13 @@ mod test {
             r? @k-nasa2
             "###;
 
-        let commands = Commands::UserAssign(UserAssign {
-            assignees: vec!["k-nasa".to_string()],
-        });
+        let commands = Commands::UserAssign(vec!["k-nasa".to_string()]);
 
         assert_eq!(parse_command(&body).unwrap(), commands);
     }
 
     #[test]
-    fn test_parse_command_when_invalid() {
+    fn test_parse_command_when_invalid_pr_event() {
         let body1 = "r? ";
         let body2 = "@hoge r?";
         let body3 = "";
