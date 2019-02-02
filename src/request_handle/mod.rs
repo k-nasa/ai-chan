@@ -35,7 +35,7 @@ struct UserAssign {
 }
 
 // FIXME 可読性が低い
-fn parse_command(body: &str) -> Vec<&str> {
+fn parse_command(body: &str) -> Result<Commands, failure::Error> {
     let input: Vec<&str> = body
         .lines()
         // FIXME unimplemented r+
@@ -43,22 +43,25 @@ fn parse_command(body: &str) -> Vec<&str> {
         .collect();
 
     if input.is_empty() {
-        return vec![];
+        failure::bail!("Not input")
     }
 
-    // TODO 最初の行にr?がなくても対応できるようにしたい
     let command_line: Vec<&str> = input[0].split_whitespace().collect();
     let (head, tail) = command_line.split_at(1);
 
-    if Some(&"r?") != head.first() {
-        return vec![];
+    if Some(&"r?") == head.first() {
+        // TODO rifactor
+        let assignees: Vec<String> = tail
+            .iter()
+            .filter(|a| a.starts_with('@'))
+            .map(|a| a.trim_start_matches('@'))
+            .map(|a| a.to_owned())
+            .collect();
+
+        return Ok(Commands::UserAssign(UserAssign { assignees }));
     }
 
-    // TODO rifactor
-    tail.iter()
-        .filter(|a| a.starts_with('@'))
-        .map(|a| a.trim_start_matches('@'))
-        .collect()
+    failure::bail!("Not Found valid command")
 }
 
 #[cfg(test)]
