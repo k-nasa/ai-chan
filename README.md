@@ -14,12 +14,12 @@ This is an operation bot to do these things automatically for your project on Gi
 
 ## Command
 
-### r? @<reviewer>
+### ```r? @<reviewer>```
 
 - You can call r? @<reviewer1> @<reviewer2> to assign multiple reviewers
 - All user can call this command.
 
-### @<botname> r+
+### ```@<botname> r+```
 
 - You can use this to merge pull
 - Now anyone can call (It is due to be fixed)
