@@ -25,13 +25,31 @@ pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult
     Ok(())
 }
 
+#[derive(PartialEq, Debug)]
 enum Commands {
     ApprovalPR,
     UserAssign(UserAssign),
 }
 
+impl Commands {
+    pub fn user_assign(self) -> Option<UserAssign> {
+        match self {
+            Commands::UserAssign(u) => Some(u),
+            _ => None,
+        }
+    }
+
+    pub fn approval_pr(&self) -> Option<()> {
+        match self {
+            Commands::ApprovalPR => Some(()),
+            _ => None,
+        }
+    }
+}
+
+#[derive(PartialEq, Debug)]
 struct UserAssign {
-    assignees: Vec<String>,
+    pub assignees: Vec<String>,
 }
 
 // FIXME 可読性が低い

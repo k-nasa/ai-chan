@@ -25,7 +25,7 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
     Ok(())
 }
 
-fn add_assignees(pull_request_event: &PullRequestEvent, assignees: &[&str]) -> AIChannResult {
+fn add_assignees(pull_request_event: &PullRequestEvent, assignees: &[String]) -> AIChannResult {
     let repo = pull_request_event
         .repository
         .full_name
@@ -39,6 +39,8 @@ fn add_assignees(pull_request_event: &PullRequestEvent, assignees: &[&str]) -> A
         Credentials::Token(config.github_api_key().to_owned()),
     );
 
+    let assignees: Vec<&str> = assignees.iter().map(|s| s.as_ref()).collect();
+
     let mut rt = Runtime::new()?;
     rt.block_on(
         github
@@ -46,7 +48,7 @@ fn add_assignees(pull_request_event: &PullRequestEvent, assignees: &[&str]) -> A
             .pulls()
             .get(pull_request_event.number.into())
             .assignees()
-            .add(assignees.to_vec()),
+            .add(assignees),
     )
     .unwrap(); //FIXME unwrap()
 
