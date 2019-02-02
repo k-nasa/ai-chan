@@ -1,3 +1,4 @@
+use crate::github::Repository;
 use serde_derive::*;
 
 // XXX 全部pubにしてしまったのでいい感じにする
@@ -46,14 +47,6 @@ pub struct PullRequest {
     pub locked: bool,
     pub title: String,
     pub body: String,
-}
-
-#[derive(Deserialize, PartialEq, Debug)]
-pub struct Repository {
-    // XXX add getter
-    pub id: u32,
-    pub name: String,
-    pub full_name: String,
 }
 
 #[derive(Deserialize, PartialEq, Debug)]
