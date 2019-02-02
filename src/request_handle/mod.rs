@@ -1,10 +1,15 @@
 mod handle_issue_comment;
 mod handle_pull_request;
 
+use crate::config::Config;
 use crate::github::github_event::GitHubEvent;
+use crate::github::issue_comment::*;
+use crate::github::Repository;
 use crate::AIChannResult;
+use hubcaps::{Credentials, Github};
 use rocket::Data;
 use std::io::Read;
+use tokio::runtime::Runtime;
 
 pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult {
     info!("Start hendle {:?} event", event);
@@ -35,6 +40,20 @@ enum Commands {
 }
 
 impl Commands {
+    pub fn is_user_assign(&self) -> bool {
+        match self {
+            Commands::UserAssign(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_approval_pr(&self) -> bool {
+        match self {
+            Commands::ApprovalPR(_) => true,
+            _ => false,
+        }
+    }
+
     pub fn user_assign(self) -> Option<Assignees> {
         match self {
             Commands::UserAssign(u) => Some(u),
@@ -47,6 +66,92 @@ impl Commands {
             Commands::ApprovalPR(b) => Some(b),
             _ => None,
         }
+    }
+
+    pub fn exec_command_assignee(self, number: u32, repository: Repository) -> AIChannResult {
+        let user_assign = self.user_assign();
+
+        if user_assign.is_none() {
+            failure::bail!("Faild parse command");
+        }
+
+        let assignees = user_assign.unwrap();
+
+        Self::add_assignees(number, &repository, &assignees)?;
+
+        info!("Add assignees {:?} to PullRequest#{}", &assignees, number);
+
+        Ok(())
+    }
+
+    pub fn exec_command_approval(self, issue_comment_event: IssueCommentEvent) -> AIChannResult {
+        let botname = self.approval_pr();
+        if botname.is_none() {
+            failure::bail!("Faild parse command");
+        }
+
+        let botname = botname.unwrap();
+        let config = Config::load_config().unwrap_or_default();
+        if botname != config.botname() {
+            failure::bail!("Invalid botname");
+        }
+
+        Self::merge_repository(issue_comment_event)?;
+
+        Ok(())
+    }
+
+    fn merge_repository(issue_comment_event: IssueCommentEvent) -> AIChannResult {
+        let repo = issue_comment_event
+            .repository
+            .full_name
+            .split('/')
+            .collect::<Vec<&str>>();
+
+        let config = Config::load_config().unwrap_or_default();
+
+        let github = Github::new(
+            concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
+            Credentials::Token(config.github_api_key().to_owned()),
+        );
+
+        let mut rt = Runtime::new()?;
+        rt.block_on(
+            github
+                .repo(repo[0], repo[1])
+                .pulls()
+                .get(issue_comment_event.issue.number.into())
+                .merge(),
+        )
+        .unwrap();
+
+        Ok(())
+    }
+
+    fn add_assignees(number: u32, repository: &Repository, assignees: &[String]) -> AIChannResult {
+        let repo = repository.full_name.split('/').collect::<Vec<&str>>();
+
+        let config = Config::load_config().unwrap_or_default();
+
+        let github = Github::new(
+            concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
+            Credentials::Token(config.github_api_key().to_owned()),
+        );
+
+        let assignees: Vec<&str> = assignees.iter().map(|s| s.as_ref()).collect();
+
+        let mut rt = Runtime::new()?;
+        rt.block_on(
+            github
+                .repo(repo[0], repo[1])
+                .pulls()
+                .get(number.into())
+                .assignees()
+                .add(assignees),
+        )
+        .unwrap(); //FIXME unwrap()
+
+        Ok(())
     }
 }
 

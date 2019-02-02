@@ -1,9 +1,6 @@
 use super::parse_command;
-use crate::config::Config;
 use crate::github::issue_comment::{IssueCommentAction, IssueCommentEvent};
 use crate::AIChannResult;
-use hubcaps::*;
-use tokio::runtime::Runtime;
 
 pub fn exec(json: serde_json::Value) -> AIChannResult {
     let issue_comment_event: IssueCommentEvent = serde_json::from_value(json)?;
@@ -14,45 +11,18 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
     }
 
     let command = parse_command(&issue_comment_event.comment.body)?;
-    let botname = command.approval_pr();
-    if botname.is_none() {
-        failure::bail!("Faild parse command");
+
+    if command.is_user_assign() {
+        command.exec_command_assignee(
+            issue_comment_event.issue.number,
+            issue_comment_event.repository,
+        )?;
+        return Ok(());
+    };
+
+    if command.is_approval_pr() {
+        command.exec_command_approval(issue_comment_event)?;
     }
-
-    let botname = botname.unwrap();
-    let config = Config::load_config().unwrap_or_default();
-    if botname != config.botname() {
-        failure::bail!("Invalid botname");
-    }
-
-    merge_repository(issue_comment_event)?;
-
-    Ok(())
-}
-
-fn merge_repository(issue_comment_event: IssueCommentEvent) -> AIChannResult {
-    let repo = issue_comment_event
-        .repository
-        .full_name
-        .split('/')
-        .collect::<Vec<&str>>();
-
-    let config = Config::load_config().unwrap_or_default();
-
-    let github = Github::new(
-        concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
-        Credentials::Token(config.github_api_key().to_owned()),
-    );
-
-    let mut rt = Runtime::new()?;
-    rt.block_on(
-        github
-            .repo(repo[0], repo[1])
-            .pulls()
-            .get(issue_comment_event.issue.number.into())
-            .merge(),
-    )
-    .unwrap();
 
     Ok(())
 }
