@@ -70,7 +70,7 @@ mod test {
     fn test_from_request_issue() {
         let client = Client::new(rocket(Config::default())).expect("valid rocket instance");
 
-        let header = Header::new("X-GitHub-Event", "issue");
+        let header = Header::new("X-GitHub-Event", "issues");
         let request = client.post("/").header(header).body("test");
 
         let event = GitHubEvent::from_request(&request.inner());
