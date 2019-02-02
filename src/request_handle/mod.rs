@@ -1,3 +1,4 @@
+mod handle_issue;
 mod handle_issue_comment;
 mod handle_pull_request;
 
@@ -24,7 +25,7 @@ pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult
     match event {
         GitHubEvent::PullRequest => handle_pull_request::exec(payload_json)?,
         GitHubEvent::IssueComment => handle_issue_comment::exec(payload_json)?,
-        GitHubEvent::Issue => warn!("unimplemented!!"),
+        GitHubEvent::Issue => handle_issue::exec(payload_json)?,
     }
 
     Ok(())
