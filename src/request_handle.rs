@@ -1,5 +1,7 @@
 use crate::config::Config;
-use crate::github::{github_event::GitHubEvent, pull_request::PullRequestEvent};
+use crate::github::{
+    github_event::GitHubEvent, issue_comment::IssueCommentEvent, pull_request::PullRequestEvent,
+};
 use crate::AIChannResult;
 use hubcaps::*;
 use rocket::Data;
