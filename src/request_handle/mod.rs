@@ -132,4 +132,27 @@ mod test {
         assert!(parse_command(&body3).is_err());
         assert!(parse_command(&body4).is_err());
     }
+
+    #[test]
+    fn test_parse_command_comment_event() {
+        let body = "@bootname r+";
+        let commands = Commands::ApprovalPR("bootname".to_owned());
+
+        assert_eq!(parse_command(&body).unwrap(), commands);
+    }
+
+    #[test]
+    fn test_parse_command_comment_event_when_many_input() {
+        let body = r###"
+            This pr is hogehogheo.
+
+            I think hogehogheo.
+
+            @botname r+
+            "###;
+
+        let commands = Commands::ApprovalPR("bootname".to_owned());
+
+        assert_eq!(parse_command(&body).unwrap(), commands);
+    }
 }
