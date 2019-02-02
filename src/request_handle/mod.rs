@@ -1,10 +1,15 @@
 mod handle_issue_comment;
 mod handle_pull_request;
 
+use crate::config::Config;
 use crate::github::github_event::GitHubEvent;
+use crate::github::issue_comment::*;
+use crate::github::Repository;
 use crate::AIChannResult;
+use hubcaps::{Credentials, Github};
 use rocket::Data;
 use std::io::Read;
+use tokio::runtime::Runtime;
 
 pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult {
     info!("Start hendle {:?} event", event);
@@ -35,6 +40,20 @@ enum Commands {
 }
 
 impl Commands {
+    pub fn is_user_assign(&self) -> bool {
+        match self {
+            Commands::UserAssign(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_approval_pr(&self) -> bool {
+        match self {
+            Commands::ApprovalPR(_) => true,
+            _ => false,
+        }
+    }
+
     pub fn user_assign(self) -> Option<Assignees> {
         match self {
             Commands::UserAssign(u) => Some(u),
