@@ -146,8 +146,8 @@ mod test {
 
     #[test]
     fn test_parse_command_comment_event() {
-        let body = "@bootname r+";
-        let commands = Commands::ApprovalPR("bootname".to_owned());
+        let body = "@botname r+";
+        let commands = Commands::ApprovalPR("botname".to_owned());
 
         assert_eq!(parse_command(&body).unwrap(), commands);
     }
@@ -162,7 +162,7 @@ mod test {
             @botname r+
             "###;
 
-        let commands = Commands::ApprovalPR("bootname".to_owned());
+        let commands = Commands::ApprovalPR("botname".to_owned());
 
         assert_eq!(parse_command(&body).unwrap(), commands);
     }
