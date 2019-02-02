@@ -51,8 +51,13 @@ fn home_dir_string() -> Result<String, failure::Error> {
 
 impl Default for Config {
     fn default() -> Self {
+        let port = std::env::var("PORT")
+            .unwrap_or("80".to_owned())
+            .parse()
+            .unwrap();
+
         Config {
-            port: 80,
+            port,
             address: "0.0.0.0".to_owned(),
             botname: "ai-chan".to_owned(),
             github_api_key: std::env::var("GITHUB_API_KEY").unwrap_or_default(),
