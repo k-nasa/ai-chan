@@ -5,6 +5,7 @@
 A helpful operation bot for GitHub. It helps assign reviewers and merge pull requests.
 
 ## What is this?
+
 I made it inspired by [popuko](https://github.com/voyagegroup/popuko)
 
 This is an operation bot to do these things automatically for your project on GitHub.
@@ -25,7 +26,9 @@ This is an operation bot to do these things automatically for your project on Gi
 - Now anyone can call (It is due to be fixed)
 
 ## Setup
+
 ### Build and Launch application
+
 0.This requires [cargo](https://github.com/rust-lang/cargo).
 1.Build from source
   - cargo build
@@ -41,6 +44,7 @@ This is an operation bot to do these things automatically for your project on Gi
 4.Done!
 
 ### Setup for your repository in GitHub
+
 1.Set the account which this app uses as a collaborator for your repository.
 
 2.Please set webhook url
