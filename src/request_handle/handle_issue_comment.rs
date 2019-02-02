@@ -1,5 +1,9 @@
-use crate::github::issue_comment::IssueCommentEvent;
+use super::parse_command;
+use crate::config::Config;
+use crate::github::issue_comment::{IssueCommentAction, IssueCommentEvent};
 use crate::AIChannResult;
+use hubcaps::*;
+use tokio::runtime::Runtime;
 
 pub fn exec(json: serde_json::Value) -> AIChannResult {
     let issue_comment_event: IssueCommentEvent = serde_json::from_value(json)?;
@@ -25,5 +29,29 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
 
     Ok(())
 }
+
+fn merge_repository(issue_comment_event: IssueCommentEvent) -> AIChannResult {
+    let repo = issue_comment_event
+        .repository
+        .full_name
+        .split('/')
+        .collect::<Vec<&str>>();
+
+    let config = Config::load_config()?;
+
+    let github = Github::new(
+        concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
+        Credentials::Token(config.github_api_key().to_owned()),
+    );
+
+    let mut rt = Runtime::new()?;
+    let merge = rt.block_on(
+        github
+            .repo(repo[0], repo[1])
+            .pulls()
+            .get(issue_comment_event.issue.number.into())
+            .merge(),
+    );
+
     Ok(())
 }
