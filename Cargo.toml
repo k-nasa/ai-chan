@@ -12,7 +12,7 @@ edition = "2018"
 [dependencies]
 dirs = "*"
 failure = "*"
-hubcaps = "*"
+hubcaps = { git = "https://github.com/k-nasa/hubcaps" }
 log = "*"
 pretty_env_logger = "*"
 rocket = "*"
