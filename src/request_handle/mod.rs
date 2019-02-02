@@ -76,6 +76,10 @@ fn parse_command(body: &str) -> Result<Commands, failure::Error> {
             .map(|a| a.to_owned())
             .collect();
 
+        if assignees.is_empty() {
+            failure::bail!("Not Found username")
+        }
+
         return Ok(Commands::UserAssign(UserAssign { assignees }));
     }
 
