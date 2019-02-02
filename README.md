@@ -30,6 +30,7 @@ This is an operation bot to do these things automatically for your project on Gi
 ### Build and Launch application
 
 0.This requires [cargo](https://github.com/rust-lang/cargo).
+
 1.Build from source
 
 - cargo build
