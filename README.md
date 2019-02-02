@@ -11,7 +11,7 @@ I made it inspired by [popuko](https://github.com/voyagegroup/popuko)
 This is an operation bot to do these things automatically for your project on GitHub.
 
 - merge pull request
-- assign a pull request to  reviewers
+- assign a pull request to reviewers
 
 ## Command
 
