@@ -22,7 +22,7 @@ This is an operation bot to do these things automatically for your project on Gi
 
 ### ```@<botname> r+```
 
-- You can use this to merge pull
+- You can use this to merge pull request
 - Now anyone can call (It is due to be fixed)
 
 ## Setup
