@@ -2,7 +2,7 @@ use rocket::request::{FromRequest, Outcome, Request};
 
 const X_GITHUB_EVENT: &str = "X-GitHub-Event";
 
-const ISSUE_EVENT: &str = "issue";
+const ISSUE_EVENT: &str = "issues";
 const ISSUE_COMMENT_EVENT: &str = "issue_comment";
 const PULL_REQUEST_EVENT: &str = "pull_request";
 
