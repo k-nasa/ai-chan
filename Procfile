@@ -1,1 +1,1 @@
-web: ./target/release/ai-chan
+web: PORT=$PORT ./target/release/ai-chan
