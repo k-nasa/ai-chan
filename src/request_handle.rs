@@ -26,7 +26,6 @@ pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult
 }
 
 fn handle_pull_request(json: serde_json::Value) -> AIChannResult {
-    let config = Config::load_config()?;
     let pull_request_event: PullRequestEvent = serde_json::from_value(json)?;
 
     let assignees = parse_command(&pull_request_event.pull_request.body);
@@ -36,11 +35,18 @@ fn handle_pull_request(json: serde_json::Value) -> AIChannResult {
         return Ok(());
     }
 
+    add_assignees(&pull_request_event, &assignees)?;
+    Ok(())
+}
+
+fn add_assignees(pull_request_event: &PullRequestEvent, assignees: &[&str]) -> AIChannResult {
     let repo = pull_request_event
         .repository
         .full_name
         .split('/')
         .collect::<Vec<&str>>();
+
+    let config = Config::load_config()?;
 
     let github = Github::new(
         concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
@@ -54,7 +60,7 @@ fn handle_pull_request(json: serde_json::Value) -> AIChannResult {
             .pulls()
             .get(pull_request_event.number.into())
             .assignees()
-            .add(assignees),
+            .add(assignees.to_vec()),
     )
     .unwrap(); //FIXME unwrap()
 
