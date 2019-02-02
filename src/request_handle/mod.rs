@@ -89,15 +89,21 @@ mod test {
     #[test]
     fn test_parse_command() {
         let body = "r? @k-nasa";
+        let commands = Commands::UserAssign(UserAssign {
+            assignees: vec!["k-nasa".to_string()],
+        });
 
-        assert_eq!(parse_command(&body), vec!["k-nasa"]);
+        assert_eq!(parse_command(&body).unwrap(), commands);
     }
 
     #[test]
     fn test_parse_command_when_many_assignees() {
         let body = "r? @k-nasa @k-nasa2";
+        let commands = Commands::UserAssign(UserAssign {
+            assignees: vec!["k-nasa".to_string(), "k-nasa2".to_owned()],
+        });
 
-        assert_eq!(parse_command(&body), vec!["k-nasa", "k-nasa2"]);
+        assert_eq!(parse_command(&body).unwrap(), commands);
     }
 
     #[test]
@@ -111,7 +117,11 @@ mod test {
             r? @k-nasa2
             "###;
 
-        assert_eq!(parse_command(&body), vec!["k-nasa"]);
+        let commands = Commands::UserAssign(UserAssign {
+            assignees: vec!["k-nasa".to_string()],
+        });
+
+        assert_eq!(parse_command(&body).unwrap(), commands);
     }
 
     #[test]
@@ -121,9 +131,9 @@ mod test {
         let body3 = "";
         let body4 = "hogehoge";
 
-        assert_eq!(parse_command(&body1), Vec::<&str>::new());
-        assert_eq!(parse_command(&body2), Vec::<&str>::new());
-        assert_eq!(parse_command(&body3), Vec::<&str>::new());
-        assert_eq!(parse_command(&body4), Vec::<&str>::new());
+        assert!(parse_command(&body1).is_err());
+        assert!(parse_command(&body2).is_err());
+        assert!(parse_command(&body3).is_err());
+        assert!(parse_command(&body4).is_err());
     }
 }
