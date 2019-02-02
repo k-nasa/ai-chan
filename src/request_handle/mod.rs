@@ -81,6 +81,17 @@ fn parse_command(body: &str) -> Result<Commands, failure::Error> {
         return Ok(Commands::UserAssign(assignees));
     }
 
+    if let Some(botname) = head.first() {
+        if !botname.starts_with("@") {
+            failure::bail!("Not Found valid command")
+        }
+
+        if tail[0] == "r+" {
+            let botname = botname.trim_start_matches('@');
+            return Ok(Commands::ApprovalPR(botname.to_string()));
+        }
+    }
+
     failure::bail!("Not Found valid command")
 }
 
