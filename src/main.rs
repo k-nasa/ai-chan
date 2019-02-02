@@ -26,8 +26,9 @@ fn main() {
     let config = match crate::config::Config::load_config() {
         Ok(c) => c,
         Err(e) => {
-            error!("Failed load config file: {}", e);
-            return;
+            warn!("Failed load config file: {}", e);
+            warn!("Using default config");
+            crate::config::Config::default()
         }
     };
 
