@@ -20,7 +20,7 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
     }
 
     let botname = botname.unwrap();
-    let config = Config::load_config()?;
+    let config = Config::load_config().unwrap_or_default();
     if botname != config.botname() {
         failure::bail!("Invalid botname");
     }
@@ -37,7 +37,7 @@ fn merge_repository(issue_comment_event: IssueCommentEvent) -> AIChannResult {
         .split('/')
         .collect::<Vec<&str>>();
 
-    let config = Config::load_config()?;
+    let config = Config::load_config().unwrap_or_default();
 
     let github = Github::new(
         concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),

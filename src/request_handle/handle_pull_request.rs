@@ -43,7 +43,7 @@ fn add_assignees(pull_request_event: &PullRequestEvent, assignees: &[String]) ->
         .split('/')
         .collect::<Vec<&str>>();
 
-    let config = Config::load_config()?;
+    let config = Config::load_config().unwrap_or_default();
 
     let github = Github::new(
         concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
