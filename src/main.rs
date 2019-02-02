@@ -48,7 +48,7 @@ fn main() {
 }
 
 fn rocket(config: crate::config::Config) -> rocket::Rocket {
-    let config = rocket::config::Config::build(Environment::Development)
+    let config = rocket::config::Config::build(Environment::Production)
         .address(config.address())
         .port(*config.port() as u16)
         .log_level(LoggingLevel::Off)
