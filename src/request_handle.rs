@@ -18,11 +18,15 @@ pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult
 
     match event {
         GitHubEvent::PullRequest => handle_pull_request(payload_json)?,
+        GitHubEvent::IssueComment => handle_issue_comment(payload_json)?,
         GitHubEvent::Issue => warn!("unimplemented!!"),
-        GitHubEvent::IssueComment => warn!("unimplemented"),
     }
 
     Ok(())
+}
+
+fn handle_issue_comment(json: serde_json::Value) -> AIChannResult {
+    unimplemented!()
 }
 
 fn handle_pull_request(json: serde_json::Value) -> AIChannResult {
