@@ -59,7 +59,7 @@ impl Default for Config {
         Config {
             port,
             address: "0.0.0.0".to_owned(),
-            botname: "ai-chan".to_owned(),
+            botname: std::env::var("BOTNAME").unwrap_or("ai-chan".to_owned()),
             github_api_key: std::env::var("GITHUB_API_KEY").unwrap_or_default(),
         }
     }
