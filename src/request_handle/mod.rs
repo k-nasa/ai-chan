@@ -1,3 +1,4 @@
+mod handle_issue;
 mod handle_issue_comment;
 mod handle_pull_request;
 
@@ -24,7 +25,7 @@ pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult
     match event {
         GitHubEvent::PullRequest => handle_pull_request::exec(payload_json)?,
         GitHubEvent::IssueComment => handle_issue_comment::exec(payload_json)?,
-        GitHubEvent::Issue => warn!("unimplemented!!"),
+        GitHubEvent::Issue => handle_issue::exec(payload_json)?,
     }
 
     Ok(())
@@ -68,7 +69,7 @@ impl Commands {
         }
     }
 
-    pub fn exec_command_assignee(self, number: u32, repository: Repository) -> AIChannResult {
+    pub fn exec_command_assignee_to_pr(self, number: u32, repository: Repository) -> AIChannResult {
         let user_assign = self.user_assign();
 
         if user_assign.is_none() {
@@ -77,7 +78,27 @@ impl Commands {
 
         let assignees = user_assign.unwrap();
 
-        Self::add_assignees(number, &repository, &assignees)?;
+        Self::add_assignees_to_pr(number, &repository, &assignees)?;
+
+        info!("Add assignees {:?} to PullRequest#{}", &assignees, number);
+
+        Ok(())
+    }
+
+    pub fn exec_command_assignee_to_issue(
+        self,
+        number: u32,
+        repository: Repository,
+    ) -> AIChannResult {
+        let user_assign = self.user_assign();
+
+        if user_assign.is_none() {
+            failure::bail!("Faild parse command");
+        }
+
+        let assignees = user_assign.unwrap();
+
+        Self::add_assignees_to_issue(number, &repository, &assignees)?;
 
         info!("Add assignees {:?} to PullRequest#{}", &assignees, number);
 
@@ -128,7 +149,41 @@ impl Commands {
         Ok(())
     }
 
-    fn add_assignees(number: u32, repository: &Repository, assignees: &[String]) -> AIChannResult {
+    fn add_assignees_to_issue(
+        number: u32,
+        repository: &Repository,
+        assignees: &[String],
+    ) -> AIChannResult {
+        let repo = repository.full_name.split('/').collect::<Vec<&str>>();
+
+        let config = Config::load_config().unwrap_or_default();
+
+        let github = Github::new(
+            concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
+            Credentials::Token(config.github_api_key().to_owned()),
+        );
+
+        let assignees: Vec<&str> = assignees.iter().map(|s| s.as_ref()).collect();
+
+        let mut rt = Runtime::new()?;
+        rt.block_on(
+            github
+                .repo(repo[0], repo[1])
+                .issues()
+                .get(number.into())
+                .assignees()
+                .add(assignees),
+        )
+        .unwrap(); //FIXME unwrap()
+
+        Ok(())
+    }
+
+    fn add_assignees_to_pr(
+        number: u32,
+        repository: &Repository,
+        assignees: &[String],
+    ) -> AIChannResult {
         let repo = repository.full_name.split('/').collect::<Vec<&str>>();
 
         let config = Config::load_config().unwrap_or_default();

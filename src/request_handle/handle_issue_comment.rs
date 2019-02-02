@@ -13,7 +13,7 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
     let command = parse_command(&issue_comment_event.comment.body)?;
 
     if command.is_user_assign() {
-        command.exec_command_assignee(
+        command.exec_command_assignee_to_pr(
             issue_comment_event.issue.number,
             issue_comment_event.repository,
         )?;
