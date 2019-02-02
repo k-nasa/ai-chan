@@ -36,6 +36,12 @@ fn handle_pull_request(json: serde_json::Value) -> AIChannResult {
     }
 
     add_assignees(&pull_request_event, &assignees)?;
+
+    info!(
+        "Add assignees {:?} to PullRequest#{}",
+        &assignees, pull_request_event.number
+    );
+
     Ok(())
 }
 
