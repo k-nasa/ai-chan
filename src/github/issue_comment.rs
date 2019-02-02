@@ -29,7 +29,12 @@ pub struct Issue {
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
-pub struct Comment {}
+pub struct Comment {
+    pub id: u32,
+    pub issue_url: String,
+    pub body: String,
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
