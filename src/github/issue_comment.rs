@@ -20,7 +20,13 @@ pub enum IssueCommentAction {
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
-pub struct Issue {}
+pub struct Issue {
+    pub id: u32,
+    pub url: String,
+    pub number: u32,
+    pub title: String,
+    pub body: String,
+}
 
 #[derive(Deserialize, Debug, PartialEq)]
 pub struct Comment {}
