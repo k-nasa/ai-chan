@@ -42,6 +42,7 @@ This is an operation bot to do these things automatically for your project on Gi
 
 ### Setup for your repository in GitHub
 1.Set the account which this app uses as a collaborator for your repository.
+
 2.Please set webhook url
   - The entry point of the request is ```http://<your_server_with_port>/github```
   - Although it is OK to send all event types, we recommend enabling only the following items
