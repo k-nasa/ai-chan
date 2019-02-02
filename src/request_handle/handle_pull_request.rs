@@ -8,12 +8,14 @@ use tokio::runtime::Runtime;
 pub fn exec(json: serde_json::Value) -> AIChannResult {
     let pull_request_event: PullRequestEvent = serde_json::from_value(json)?;
 
-    let assignees = parse_command(&pull_request_event.pull_request.body);
+    let command = parse_command(&pull_request_event.pull_request.body)?;
+    let user_assign = command.user_assign();
 
-    if assignees.is_empty() {
-        warn!("Not Found valid command");
-        return Ok(());
+    if user_assign.is_none() {
+        failure::bail!("Faild parse command");
     }
+
+    let assignees = user_assign.unwrap().assignees;
 
     add_assignees(&pull_request_event, &assignees)?;
 
