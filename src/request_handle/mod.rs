@@ -25,6 +25,15 @@ pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult
     Ok(())
 }
 
+enum Commands {
+    ApprovalPR,
+    UserAssign(UserAssign),
+}
+
+struct UserAssign {
+    assignees: Vec<String>,
+}
+
 // FIXME 可読性が低い
 fn parse_command(body: &str) -> Vec<&str> {
     let input: Vec<&str> = body
