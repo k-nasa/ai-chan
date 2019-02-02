@@ -1,0 +1,4 @@
+port = 8000
+address="localhost"
+botname = "ai-chann"
+api_token = "api_token"
