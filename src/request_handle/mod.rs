@@ -1,12 +1,10 @@
-use crate::config::Config;
-use crate::github::{
-    github_event::GitHubEvent, issue_comment::IssueCommentEvent, pull_request::PullRequestEvent,
-};
+mod handle_issue_comment;
+mod handle_pull_request;
+
+use crate::github::github_event::GitHubEvent;
 use crate::AIChannResult;
-use hubcaps::*;
 use rocket::Data;
 use std::io::Read;
-use tokio::runtime::Runtime;
 
 pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult {
     info!("Start hendle {:?} event", event);
@@ -19,62 +17,10 @@ pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult
     let payload_json: serde_json::Value = serde_json::from_str(&json_string)?;
 
     match event {
-        GitHubEvent::PullRequest => handle_pull_request(payload_json)?,
-        GitHubEvent::IssueComment => handle_issue_comment(payload_json)?,
+        GitHubEvent::PullRequest => handle_pull_request::exec(payload_json)?,
+        GitHubEvent::IssueComment => handle_issue_comment::exec(payload_json)?,
         GitHubEvent::Issue => warn!("unimplemented!!"),
     }
-
-    Ok(())
-}
-
-fn handle_issue_comment(json: serde_json::Value) -> AIChannResult {
-    unimplemented!()
-}
-
-fn handle_pull_request(json: serde_json::Value) -> AIChannResult {
-    let pull_request_event: PullRequestEvent = serde_json::from_value(json)?;
-
-    let assignees = parse_command(&pull_request_event.pull_request.body);
-
-    if assignees.is_empty() {
-        warn!("Not Found valid command");
-        return Ok(());
-    }
-
-    add_assignees(&pull_request_event, &assignees)?;
-
-    info!(
-        "Add assignees {:?} to PullRequest#{}",
-        &assignees, pull_request_event.number
-    );
-
-    Ok(())
-}
-
-fn add_assignees(pull_request_event: &PullRequestEvent, assignees: &[&str]) -> AIChannResult {
-    let repo = pull_request_event
-        .repository
-        .full_name
-        .split('/')
-        .collect::<Vec<&str>>();
-
-    let config = Config::load_config()?;
-
-    let github = Github::new(
-        concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
-        Credentials::Token(config.github_api_key().to_owned()),
-    );
-
-    let mut rt = Runtime::new()?;
-    rt.block_on(
-        github
-            .repo(repo[0], repo[1])
-            .pulls()
-            .get(pull_request_event.number.into())
-            .assignees()
-            .add(assignees.to_vec()),
-    )
-    .unwrap(); //FIXME unwrap()
 
     Ok(())
 }
