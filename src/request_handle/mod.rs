@@ -98,7 +98,7 @@ impl Commands {
 
         let assignees = user_assign.unwrap();
 
-        Self::add_assignees_to_pr(number, &repository, &assignees)?;
+        Self::add_assignees_to_issue(number, &repository, &assignees)?;
 
         info!("Add assignees {:?} to PullRequest#{}", &assignees, number);
 
