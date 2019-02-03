@@ -5,11 +5,11 @@ use tokio::runtime::Runtime;
 
 #[derive(Deserialize, Serialize, Debug, PartialEq)]
 pub struct Owners {
-    reviewers: Vec<String>,
+    pub reviewers: Vec<String>,
 }
 
 impl Owners {
-    pub fn from_repository(repository_full_name: String) -> Result<Self, failure::Error> {
+    pub fn from_repository(repository_full_name: &str) -> Result<Self, failure::Error> {
         let repo = repository_full_name.split('/').collect::<Vec<&str>>();
         let config = Config::load_config().unwrap_or_default();
         let github = Github::new(
