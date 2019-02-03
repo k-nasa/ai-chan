@@ -18,11 +18,13 @@ impl Owners {
         );
 
         let mut rt = Runtime::new()?;
-        let file = rt
-            .block_on(github.repo(repo[0], repo[1]).content().file("owners.toml"))
-            .unwrap();
+        let file = rt.block_on(github.repo(repo[0], repo[1]).content().file("owners.toml"));
 
-        let content: Vec<u8> = file.content.into();
+        if let Err(e) = file {
+            failure::bail!("{}", e);
+        }
+
+        let content: Vec<u8> = file.unwrap().content.into();
         let content = String::from_utf8(content)?;
 
         let owners = toml::from_str(&content)?;
