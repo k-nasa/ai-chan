@@ -1,4 +1,4 @@
-use crate::github::Repository;
+use crate::github::{Repository, User};
 use serde_derive::*;
 
 #[derive(Deserialize, PartialEq, Debug)]
@@ -33,6 +33,7 @@ pub struct Comment {
     pub id: u32,
     pub issue_url: String,
     pub body: String,
+    pub user: User,
 }
 
 #[cfg(test)]
@@ -61,6 +62,10 @@ mod test {
                     .to_owned(),
 
                 body: "You are totally right! I'll get this fixed right away.".to_owned(),
+                user: User {
+                    id: 1,
+                    login: "Codertocat".into(),
+                },
             },
             repository: Repository {
                 id: 135_493_233,

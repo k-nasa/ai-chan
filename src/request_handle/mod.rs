@@ -6,6 +6,7 @@ use crate::config::Config;
 use crate::github::github_event::GitHubEvent;
 use crate::github::issue_comment::*;
 use crate::github::Repository;
+use crate::owners::Owners;
 use crate::AIChannResult;
 use hubcaps::{Credentials, Github};
 use rocket::Data;
@@ -115,6 +116,14 @@ impl Commands {
         let config = Config::load_config().unwrap_or_default();
         if botname != config.botname() {
             failure::bail!("Invalid botname");
+        }
+
+        let repository_full_name = &issue_comment_event.repository.full_name;
+        let username = &issue_comment_event.comment.user.login;
+
+        let owners = Owners::from_repository(repository_full_name)?;
+        if !owners.reviewers.iter().any(|r| username == r) {
+            failure::bail!("No merge permission");
         }
 
         Self::merge_repository(issue_comment_event)?;

@@ -12,3 +12,9 @@ pub struct Repository {
     pub name: String,
     pub full_name: String,
 }
+
+#[derive(Deserialize, PartialEq, Debug)]
+pub struct User {
+    pub id: u32,
+    pub login: String,
+}

@@ -520,7 +520,7 @@ pub fn issue_comment_payload() -> String {
     "node_id": "MDEyOklzc3VlQ29tbWVudDM5MzMwNDEzMw==",
     "user": {
       "login": "Codertocat",
-      "id": 21031067,
+      "id": 1,
       "node_id": "MDQ6VXNlcjIxMDMxMDY3",
       "avatar_url": "https://avatars1.githubusercontent.com/u/21031067?v=4",
       "gravatar_id": "",
