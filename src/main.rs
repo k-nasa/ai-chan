@@ -3,6 +3,7 @@
 
 mod config;
 mod github;
+mod owners;
 mod request_handle;
 mod test_support;
 
