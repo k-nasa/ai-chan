@@ -1,3 +1,4 @@
+use crypto::{hmac::Hmac, mac::Mac, sha1::Sha1};
 use serde_derive::*;
 use std::fs::*;
 use std::io::Read;
@@ -9,6 +10,7 @@ pub struct Config {
     address: String,
     botname: String,
     github_api_key: String,
+    secret: String,
 }
 
 impl Config {
@@ -61,6 +63,7 @@ impl Default for Config {
             address: "0.0.0.0".to_owned(),
             botname: std::env::var("BOTNAME").unwrap_or("ai-chan".to_owned()),
             github_api_key: std::env::var("GITHUB_API_KEY").unwrap_or_default(),
+            secret: std::env::var("WEBHOOK_SECRET").unwrap_or_default(),
         }
     }
 }
