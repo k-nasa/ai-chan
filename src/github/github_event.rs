@@ -1,6 +1,7 @@
 use rocket::request::{FromRequest, Outcome, Request};
 
 const X_GITHUB_EVENT: &str = "X-GitHub-Event";
+const X_HUB_SIGNATURE: &'static str = "X-Hub-Signature";
 
 const ISSUE_EVENT: &str = "issues";
 const ISSUE_COMMENT_EVENT: &str = "issue_comment";
@@ -42,6 +43,29 @@ impl<'a, 'r> FromRequest<'a, 'r> for GitHubEvent {
         };
 
         Outcome::Success(event)
+    }
+}
+
+#[derive(Debug)]
+pub struct Signe(pub String);
+
+impl<'a, 'r> FromRequest<'a, 'r> for Signe {
+    type Error = failure::Error;
+
+    fn from_request(request: &'a Request<'r>) -> Outcome<Self, Self::Error> {
+        let signe = request.headers().get_one(X_HUB_SIGNATURE);
+
+        let body = match signe {
+            Some(e) => e,
+            None => {
+                return Outcome::Failure((
+                    rocket::http::Status::BadRequest,
+                    failure::format_err!("{} is not set", X_HUB_SIGNATURE),
+                ));
+            }
+        };
+
+        Outcome::Success(Signe(body.to_string()))
     }
 }
 

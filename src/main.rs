@@ -13,12 +13,17 @@ extern crate pretty_env_logger;
 
 type AIChannResult = Result<(), failure::Error>;
 
-use github::github_event::GitHubEvent;
+use crate::config::Config;
+use failure::Error;
+use github::github_event::{GitHubEvent, Signe};
 use request_handle::handle_github_webhook;
 use rocket::{
     config::{Environment, LoggingLevel},
-    get, post, routes, Data,
+    get, post,
+    request::Request,
+    routes, Data,
 };
+use std::io::Read;
 
 fn main() {
     std::env::set_var("RUST_LOG", "ai_chan");
@@ -66,13 +71,32 @@ fn index() -> &'static str {
 }
 
 #[post("/github", format = "application/json", data = "<payload>")]
-fn github(event: Result<GitHubEvent, failure::Error>, payload: Data) {
+fn github(signe: Result<Signe, Error>, event: Result<GitHubEvent, Error>, payload: Data) {
     if let Err(e) = event {
         warn!("{}", e);
         return;
     }
 
-    let result = handle_github_webhook(event.unwrap(), payload);
+    if let Err(e) = signe {
+        error!("{}", e);
+        return;
+    }
+
+    let mut json_string = String::new();
+    if payload.open().read_to_string(&mut json_string).is_err() {
+        error!("Bad request. failed read payload.");
+        return;
+    };
+
+    let config = Config::load_config().unwrap_or_default();
+    let signature = signe.unwrap().0;
+
+    if !config.is_secret_valid(&signature, &json_string) {
+        error!("Invalid signe.");
+        return;
+    }
+
+    let result = handle_github_webhook(event.unwrap(), &json_string);
 
     match result {
         Ok(_) => info!("Sucess request handle"),
