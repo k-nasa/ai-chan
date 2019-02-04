@@ -29,6 +29,33 @@ impl Config {
         Ok(config)
     }
 
+    // XXX Be sure to refactor
+    pub fn is_secret_valid(&self, signature: &str, payload: &str) -> bool {
+        let digest = Sha1::new();
+        let mut hmac = Hmac::new(digest, self.secret.as_bytes());
+        hmac.input(payload.as_bytes());
+        let expected_signature = hmac.result();
+
+        let parts = signature.splitn(2, '=').collect::<Vec<_>>();
+        let code = parts[1];
+
+        crypto::util::fixed_time_eq(
+            Self::bytes_to_hex(expected_signature.code()).as_bytes(),
+            code.as_bytes(),
+        )
+    }
+
+    fn bytes_to_hex(bytes: &[u8]) -> String {
+        const CHARS: &'static [u8] = b"0123456789abcdef";
+        let mut v = Vec::with_capacity(bytes.len() * 2);
+        for &byte in bytes {
+            v.push(CHARS[(byte >> 4) as usize]);
+            v.push(CHARS[(byte & 0xf) as usize]);
+        }
+
+        unsafe { String::from_utf8_unchecked(v) }
+    }
+
     pub fn port(&self) -> &u32 {
         &self.port
     }
