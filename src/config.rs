@@ -30,6 +30,7 @@ impl Config {
     }
 
     // XXX Be sure to refactor
+    // TODO Add test code
     pub fn is_secret_valid(&self, signature: &str, payload: &str) -> bool {
         let digest = Sha1::new();
         let mut hmac = Hmac::new(digest, self.secret.as_bytes());
