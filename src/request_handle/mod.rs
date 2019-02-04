@@ -9,19 +9,12 @@ use crate::github::Repository;
 use crate::owners::Owners;
 use crate::AIChannResult;
 use hubcaps::{Credentials, Github};
-use rocket::Data;
-use std::io::Read;
 use tokio::runtime::Runtime;
 
-pub fn handle_github_webhook(event: GitHubEvent, payload: Data) -> AIChannResult {
+pub fn handle_github_webhook(event: GitHubEvent, json_string: &str) -> AIChannResult {
     info!("Start hendle {:?} event", event);
 
-    let mut json_string = String::new();
-    if payload.open().read_to_string(&mut json_string).is_err() {
-        failure::bail!("Bad request. failed read payload.");
-    }
-
-    let payload_json: serde_json::Value = serde_json::from_str(&json_string)?;
+    let payload_json: serde_json::Value = serde_json::from_str(json_string)?;
 
     match event {
         GitHubEvent::PullRequest => handle_pull_request::exec(payload_json)?,
