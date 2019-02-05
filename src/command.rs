@@ -112,16 +112,14 @@ impl Command {
 
         info!("{}", pull.head.ref_string);
 
-        let is_err = rt
-            .block_on(
-                github
-                    .repo(repo[0], repo[1])
-                    .git()
-                    .delete_reference(format!("heads/{}", pull.head.ref_string)),
-            )
-            .is_err();
+        let result = rt.block_on(
+            github
+                .repo(repo[0], repo[1])
+                .git()
+                .delete_reference(format!("heads/{}", pull.head.ref_string)),
+        );
 
-        if is_err {
+        if result.is_err() {
             failure::bail!("Failed delete branch");
         }
 
