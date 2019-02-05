@@ -17,34 +17,6 @@ pub enum Command {
 }
 
 impl Command {
-    pub fn is_user_assign(&self) -> bool {
-        match self {
-            Command::UserAssign(_) => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_approval_pr(&self) -> bool {
-        match self {
-            Command::ApprovalPR(_) => true,
-            _ => false,
-        }
-    }
-
-    pub fn user_assign(self) -> Option<Assignees> {
-        match self {
-            Command::UserAssign(u) => Some(u),
-            _ => None,
-        }
-    }
-
-    pub fn approval_pr(self) -> Option<BotName> {
-        match self {
-            Command::ApprovalPR(b) => Some(b),
-            _ => None,
-        }
-    }
-
     pub fn exec_command_assignee_to_pr(self, number: u32, repository: Repository) -> AIChannResult {
         let user_assign = self.user_assign();
 
@@ -269,6 +241,34 @@ impl Command {
         }
 
         failure::bail!("Not Found valid command")
+    }
+
+    pub fn is_user_assign(&self) -> bool {
+        match self {
+            Command::UserAssign(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_approval_pr(&self) -> bool {
+        match self {
+            Command::ApprovalPR(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn user_assign(self) -> Option<Assignees> {
+        match self {
+            Command::UserAssign(u) => Some(u),
+            _ => None,
+        }
+    }
+
+    pub fn approval_pr(self) -> Option<BotName> {
+        match self {
+            Command::ApprovalPR(b) => Some(b),
+            _ => None,
+        }
     }
 }
 
