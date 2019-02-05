@@ -1,4 +1,4 @@
-use super::parse_command;
+use crate::command::Command;
 use crate::github::pull_request::{PullRequestAction, PullRequestEvent};
 use crate::AIChannResult;
 
@@ -14,7 +14,7 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
         return Ok(());
     }
 
-    let command = parse_command(&pull_request_event.pull_request.body)?;
+    let command = Command::parse_command(&pull_request_event.pull_request.body)?;
 
     if command.is_user_assign() {
         command.exec_command_assignee_to_pr(

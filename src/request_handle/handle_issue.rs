@@ -1,4 +1,4 @@
-use super::parse_command;
+use crate::command::Command;
 use crate::github::issue::*;
 use crate::AIChannResult;
 use serde_json::Value;
@@ -12,7 +12,7 @@ pub fn exec(json: Value) -> AIChannResult {
         return Ok(());
     }
 
-    let command = parse_command(&issue_event.issue.body)?;
+    let command = Command::parse_command(&issue_event.issue.body)?;
 
     if command.is_user_assign() {
         command.exec_command_assignee_to_issue(issue_event.issue.number, issue_event.repository)?;
