@@ -16,6 +16,20 @@ pub enum Command {
     UserAssign(Assignees),
 }
 
+macro_rules! github_client_setup {
+    () => {
+        Github::new(
+            concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
+            Credentials::Token(
+                Config::load_config()
+                    .unwrap_or_default()
+                    .github_api_key()
+                    .to_owned(),
+            ),
+        )
+    };
+}
+
 impl Command {
     pub fn exec_command_assignee_to_pr(self, number: u32, repository: Repository) -> AIChannResult {
         let user_assign = self.user_assign();
