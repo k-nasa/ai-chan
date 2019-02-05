@@ -47,6 +47,21 @@ pub struct PullRequest {
     pub locked: bool,
     pub title: String,
     pub body: String,
+    pub head: Head,
+    pub base: Base,
+}
+#[derive(Deserialize, PartialEq, Debug)]
+pub struct Base {
+    label: String,
+    #[serde(rename = "ref")]
+    pub ref_string: String,
+}
+
+#[derive(Deserialize, PartialEq, Debug)]
+pub struct Head {
+    label: String,
+    #[serde(rename = "ref")]
+    pub ref_string: String,
 }
 
 #[derive(Deserialize, PartialEq, Debug)]
@@ -83,6 +98,14 @@ mod test {
                 locked: false,
                 title: "Update the README with new information".to_owned(),
                 body: "This is a pretty simple change that we need to pull into master.".to_owned(),
+                head: Head {
+                    label: "Codertocat:changes".into(),
+                    ref_string: "changes".into(),
+                },
+                base: Base {
+                    label: "Codertocat:master".into(),
+                    ref_string: "master".into(),
+                },
             },
         };
 
