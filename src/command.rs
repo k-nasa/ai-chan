@@ -103,11 +103,7 @@ impl Command {
         }
 
         let repo = repo.split('/').collect::<Vec<&str>>();
-        let config = Config::load_config().unwrap_or_default();
-        let github = Github::new(
-            concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
-            Credentials::Token(config.github_api_key().to_owned()),
-        );
+        let github = github_client_setup!();
 
         let mut rt = Runtime::new()?;
         let pull: PullRequest = rt
@@ -134,13 +130,7 @@ impl Command {
 
     fn merge_repository(issue_comment_event: IssueCommentEvent) -> AIChannResult {
         let repo = issue_comment_event.repository.repo_tuple();
-
-        let config = Config::load_config().unwrap_or_default();
-
-        let github = Github::new(
-            concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
-            Credentials::Token(config.github_api_key().to_owned()),
-        );
+        let github = github_client_setup!();
 
         let mut rt = Runtime::new()?;
         rt.block_on(
@@ -161,14 +151,7 @@ impl Command {
         assignees: &[String],
     ) -> AIChannResult {
         let repo = repository.repo_tuple();
-
-        let config = Config::load_config().unwrap_or_default();
-
-        let github = Github::new(
-            concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
-            Credentials::Token(config.github_api_key().to_owned()),
-        );
-
+        let github = github_client_setup!();
         let assignees: Vec<&str> = assignees.iter().map(|s| s.as_ref()).collect();
 
         let mut rt = Runtime::new()?;
@@ -191,12 +174,7 @@ impl Command {
         assignees: &[String],
     ) -> AIChannResult {
         let repo = repository.repo_tuple();
-        let config = Config::load_config().unwrap_or_default();
-        let github = Github::new(
-            concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
-            Credentials::Token(config.github_api_key().to_owned()),
-        );
-
+        let github = github_client_setup!();
         let assignees: Vec<&str> = assignees.iter().map(|s| s.as_ref()).collect();
 
         let mut rt = Runtime::new()?;
