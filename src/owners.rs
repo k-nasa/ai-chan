@@ -6,6 +6,7 @@ use tokio::runtime::Runtime;
 #[derive(Deserialize, Serialize, Debug, PartialEq)]
 pub struct Owners {
     pub reviewers: Vec<String>,
+    pub delete_branch: Option<bool>,
 }
 
 impl Owners {
@@ -31,6 +32,13 @@ impl Owners {
 
         Ok(owners)
     }
+
+    pub fn is_some_true(&self) -> bool {
+        match self.delete_branch {
+            Some(true) => true,
+            _ => false,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -39,10 +47,25 @@ mod test {
 
     #[test]
     fn from_toml_string() {
-        let toml = r###"reviewers = ["k-nasa"]"###;
+        let toml = r###"
+            reviewers = ["k-nasa"]
+            "###;
 
         let owners = Owners {
             reviewers: vec!["k-nasa".to_string()],
+            delete_branch: None,
+        };
+
+        assert_eq!(owners, toml::from_str(toml).unwrap());
+
+        let toml = r###"
+            reviewers = ["k-nasa"]
+            delete_branch = true
+            "###;
+
+        let owners = Owners {
+            reviewers: vec!["k-nasa".to_string()],
+            delete_branch: Some(true),
         };
 
         assert_eq!(owners, toml::from_str(toml).unwrap());

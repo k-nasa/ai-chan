@@ -19,9 +19,7 @@ use github::github_event::{GitHubEvent, Signe};
 use request_handle::handle_github_webhook;
 use rocket::{
     config::{Environment, LoggingLevel},
-    get, post,
-    request::Request,
-    routes, Data,
+    get, post, routes, Data,
 };
 use std::io::Read;
 
