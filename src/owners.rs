@@ -32,6 +32,13 @@ impl Owners {
 
         Ok(owners)
     }
+
+    pub fn is_some_true(&self) -> bool {
+        match self.delete_branch {
+            Some(true) => true,
+            _ => false,
+        }
+    }
 }
 
 #[cfg(test)]
