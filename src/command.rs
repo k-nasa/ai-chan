@@ -194,7 +194,6 @@ impl Command {
     pub fn parse_command(body: &str) -> Result<Command, failure::Error> {
         let input: Vec<&str> = body
             .lines()
-            // FIXME unimplemented r+
             .filter(|l| l.contains("r?") || l.contains("r+"))
             .collect();
 
@@ -206,7 +205,6 @@ impl Command {
         let (head, tail) = command_line.split_at(1);
 
         if Some(&"r?") == head.first() {
-            // TODO rifactor
             let assignees: Vec<String> = tail
                 .iter()
                 .filter(|a| a.starts_with('@'))
