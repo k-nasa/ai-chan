@@ -47,7 +47,7 @@ impl Config {
     }
 
     fn bytes_to_hex(bytes: &[u8]) -> String {
-        const CHARS: &'static [u8] = b"0123456789abcdef";
+        const CHARS: &[u8] = b"0123456789abcdef";
         let mut v = Vec::with_capacity(bytes.len() * 2);
         for &byte in bytes {
             v.push(CHARS[(byte >> 4) as usize]);

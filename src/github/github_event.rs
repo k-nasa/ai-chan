@@ -1,7 +1,7 @@
 use rocket::request::{FromRequest, Outcome, Request};
 
 const X_GITHUB_EVENT: &str = "X-GitHub-Event";
-const X_HUB_SIGNATURE: &'static str = "X-Hub-Signature";
+const X_HUB_SIGNATURE: &str = "X-Hub-Signature";
 
 const ISSUE_EVENT: &str = "issues";
 const ISSUE_COMMENT_EVENT: &str = "issue_comment";

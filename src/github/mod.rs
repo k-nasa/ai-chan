@@ -13,6 +13,14 @@ pub struct Repository {
     pub full_name: String,
 }
 
+impl Repository {
+    pub fn repo_tuple(&self) -> (&str, &str) {
+        let repo = self.full_name.split('/').collect::<Vec<&str>>();
+
+        (repo[0], repo[1])
+    }
+}
+
 #[derive(Deserialize, PartialEq, Debug)]
 pub struct User {
     pub id: u32,
