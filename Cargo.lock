@@ -451,7 +451,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "hubcaps"
 version = "0.5.0"
-source = "git+https://github.com/k-nasa/hubcaps#4608a3503e23ee52d7ce606168f3b7be8ba2feb0"
+source = "git+https://github.com/k-nasa/hubcaps#51c80f2ae4f48307005ac1224974c0ef0a0cbcc7"
 dependencies = [
  "base64 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "error-chain 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
