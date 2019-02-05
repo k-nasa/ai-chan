@@ -5,6 +5,7 @@ mod handle_pull_request;
 use crate::config::Config;
 use crate::github::github_event::GitHubEvent;
 use crate::github::issue_comment::*;
+use crate::github::pull_request::*;
 use crate::github::Repository;
 use crate::owners::Owners;
 use crate::AIChannResult;
@@ -119,7 +120,47 @@ impl Commands {
             failure::bail!("No merge permission");
         }
 
+        let number = issue_comment_event.issue.number;
+        let repo = issue_comment_event.repository.full_name.clone();
+
         Self::merge_repository(issue_comment_event)?;
+        Self::delete_branch(owners, &repo, number)?;
+
+        Ok(())
+    }
+
+    fn delete_branch(owners: Owners, repo: &str, number: u32) -> AIChannResult {
+        if owners.is_some_true() {
+            info!("delete_branch setting is nothing");
+            return Ok(());
+        }
+
+        let repo = repo.split('/').collect::<Vec<&str>>();
+        let config = Config::load_config().unwrap_or_default();
+        let github = Github::new(
+            concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
+            Credentials::Token(config.github_api_key().to_owned()),
+        );
+
+        let mut rt = Runtime::new()?;
+        let pull: PullRequest = rt
+            .block_on(github.get(&format!("/repos/{}/{}/pulls/{}", repo[0], repo[1], number)))
+            .unwrap();
+
+        info!("{}", pull.head.ref_string);
+
+        let is_err = rt
+            .block_on(
+                github
+                    .repo(repo[0], repo[1])
+                    .git()
+                    .delete_reference(format!("heads/{}", pull.head.ref_string)),
+            )
+            .is_err();
+
+        if is_err {
+            failure::bail!("Failed delete branch");
+        }
 
         Ok(())
     }
