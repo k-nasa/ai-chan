@@ -113,3 +113,24 @@ pub fn add_assignees_to_pr(
 
     Ok(())
 }
+
+pub fn add_label(number: u32, repository: &Repository, labels: Vec<&str>) -> AIChannResult {
+    let repo = repository.repo_tuple();
+    let github = github_client_setup!();
+
+    let mut rt = Runtime::new()?;
+    let result = rt.block_on(
+        github
+            .repo(repo.0, repo.1)
+            .pulls()
+            .get(number.into())
+            .labels()
+            .add(labels),
+    );
+
+    if result.is_err() {
+        failure::bail!("Failed add labels");
+    }
+
+    Ok(())
+}
