@@ -1,3 +1,4 @@
+pub mod api;
 pub mod github_event;
 pub mod issue;
 pub mod issue_comment;
