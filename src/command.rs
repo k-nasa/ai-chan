@@ -23,8 +23,10 @@ impl Command {
         }
 
         let assignees = user_assign.unwrap();
+        let label_name = vec!["S-awaiting-review"];
 
         add_assignees_to_pr(number, &repository, &assignees)?;
+        add_label(number, &repository, label_name)?;
 
         info!("Add assignees {:?} to PullRequest#{}", &assignees, number);
 
