@@ -114,6 +114,34 @@ pub fn add_assignees_to_pr(
     Ok(())
 }
 
+pub fn add_reviewers_to_pr(
+    number: u32,
+    repository: &Repository,
+    reviewers: &[String],
+) -> AIChannResult {
+    let repo = repository.repo_tuple();
+    let github = github_client_setup!();
+    let reviewers: Vec<&str> = reviewers.iter().map(|s| s.as_ref()).collect();
+
+    let mut map = std::collections::HashMap::new();
+    map.insert("reviewers", reviewers);
+
+    let mut rt = Runtime::new()?;
+    let result: Result<serde_json::Value, _> = rt.block_on(github.post(
+        &format!(
+            "/repos/{}/{}/pulls/{}/requested_reviewers",
+            repo.0, repo.1, number
+        ),
+        serde_json::to_vec(&map)?,
+    ));
+
+    if result.is_err() {
+        failure::bail!("Failed add reviewers: {:?}", result);
+    }
+
+    Ok(())
+}
+
 pub fn add_label(number: u32, repository: &Repository, labels: Vec<&str>) -> AIChannResult {
     let repo = repository.repo_tuple();
     let github = github_client_setup!();
