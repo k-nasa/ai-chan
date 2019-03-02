@@ -33,11 +33,7 @@ impl Command {
         Ok(())
     }
 
-    pub fn exec_command_rand_assignee_to_pr(
-        self,
-        number: u32,
-        repository: Repository,
-    ) -> AIChannResult {
+    pub fn exec_command_rand_assignee_to_pr(number: u32, repository: Repository) -> AIChannResult {
         let owners = Owners::from_repository(&repository.full_name)?;
         let assignees = owners.pick_assignee();
         let label_name = vec!["S-awaiting-review"];
