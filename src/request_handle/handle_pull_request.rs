@@ -1,4 +1,5 @@
 use crate::command::Command;
+use crate::config::Config;
 use crate::github::pull_request::{PullRequestAction, PullRequestEvent};
 use crate::AIChannResult;
 
@@ -18,6 +19,15 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
 
     if command.is_user_assign() {
         command.exec_command_assignee_to_pr(
+            pull_request_event.pull_request.number,
+            pull_request_event.repository,
+        )?;
+        return Ok(());
+    }
+
+    let config = Config::load_config().unwrap_or_default();
+    if config.rand_assigne() {
+        command.exec_command_rand_assignee_to_pr(
             pull_request_event.pull_request.number,
             pull_request_event.repository,
         )?;
