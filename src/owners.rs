@@ -1,5 +1,6 @@
 use crate::config::Config;
 use hubcaps::{Credentials, Github};
+use rand::Rng;
 use serde_derive::*;
 use tokio::runtime::Runtime;
 
@@ -39,6 +40,12 @@ impl Owners {
             _ => false,
         }
     }
+
+    pub fn pick_assignee(&self) -> Option<&String> {
+        let index: usize = rand::thread_rng().gen_range(0, self.reviewers.len());
+
+        self.reviewers.get(index)
+    }
 }
 
 #[cfg(test)]
@@ -69,5 +76,39 @@ mod test {
         };
 
         assert_eq!(owners, toml::from_str(toml).unwrap());
+    }
+
+    #[test]
+    fn pick_assignee() {
+        let owners = Owners {
+            reviewers: vec!["k-nasa".into()],
+            delete_branch: None,
+        };
+
+        assert_eq!(owners.pick_assignee(), Some(&"k-nasa".to_string()))
+    }
+
+    #[test]
+    fn pick_assignee_from_many() {
+        let owners = Owners {
+            reviewers: vec!["k-nasa".into(), "ai-chan".into()],
+            delete_branch: None,
+        };
+
+        let mut rand_k_nasa = false;
+        let mut rand_ai_chan = false;
+
+        for _ in 0..10 {
+            let picked = owners.pick_assignee();
+            if picked == Some(&String::from("k-nasa")) {
+                rand_k_nasa = true
+            }
+
+            if picked == Some(&String::from("ai-chan")) {
+                rand_ai_chan = true
+            }
+
+            assert!(rand_k_nasa || rand_ai_chan);
+        }
     }
 }

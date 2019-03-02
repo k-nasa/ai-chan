@@ -3,6 +3,7 @@ use serde_derive::*;
 use std::fs::*;
 use std::io::Read;
 use std::path::Path;
+use std::str::FromStr;
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Config {
@@ -11,6 +12,7 @@ pub struct Config {
     botname: String,
     github_api_key: String,
     secret: String,
+    rand_assigne: Option<bool>,
 }
 
 impl Config {
@@ -70,6 +72,9 @@ impl Config {
     pub fn github_api_key(&self) -> &str {
         &self.github_api_key
     }
+    pub fn rand_assigne(&self) -> bool {
+        self.rand_assigne.unwrap_or(false)
+    }
 }
 
 fn home_dir_string() -> Result<String, failure::Error> {
@@ -86,12 +91,16 @@ impl Default for Config {
             .parse()
             .unwrap();
 
+        let rand_assigne_string = option_env!("RAND_ASSIGNE").unwrap_or_default();
+        let rand_assigne = FromStr::from_str(rand_assigne_string).unwrap_or(false);
+
         Config {
             port,
             address: "0.0.0.0".to_owned(),
             botname: std::env::var("BOTNAME").unwrap_or("ai-chan".to_owned()),
             github_api_key: std::env::var("GITHUB_API_KEY").unwrap_or_default(),
             secret: std::env::var("WEBHOOK_SECRET").unwrap_or_default(),
+            rand_assigne: Some(rand_assigne),
         }
     }
 }

@@ -37,6 +37,7 @@ fn main() {
         }
     };
 
+    // FIXME configに項目を足すたびにここが変わる可能性があるのでなんとかしたい
     info!("===== ai-chann ===================================");
     info!("start server");
     info!("address: {}", config.address());
@@ -47,6 +48,9 @@ fn main() {
         config.address(),
         config.port()
     );
+    if config.rand_assigne() {
+        info!("Random assignment is set");
+    }
     info!("===================================================");
 
     rocket(config).launch();
