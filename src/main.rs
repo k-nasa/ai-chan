@@ -48,9 +48,6 @@ fn main() {
         config.address(),
         config.port()
     );
-    if config.rand_assigne() {
-        info!("Random assignment is set");
-    }
     info!("===================================================");
 
     rocket(config).launch();
