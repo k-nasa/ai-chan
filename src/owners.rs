@@ -24,7 +24,7 @@ impl Owners {
         let file = rt.block_on(github.repo(repo[0], repo[1]).content().file("owners.toml"));
 
         if let Err(e) = file {
-            failure::bail!("{}", e);
+            failure::bail!("failed import owners.toml:{}", e);
         }
 
         let content: Vec<u8> = file.unwrap().content.into();
