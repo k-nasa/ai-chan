@@ -8,6 +8,7 @@ use tokio::runtime::Runtime;
 pub struct Owners {
     pub reviewers: Vec<String>,
     pub delete_branch: Option<bool>,
+    rand_assigne: Option<bool>,
 }
 
 impl Owners {
@@ -41,6 +42,10 @@ impl Owners {
         }
     }
 
+    pub fn rand_assigne(&self) -> bool {
+        self.rand_assigne.unwrap_or(false)
+    }
+
     pub fn pick_assignee(&self) -> Option<&String> {
         let index: usize = rand::thread_rng().gen_range(0, self.reviewers.len());
 
@@ -56,11 +61,13 @@ mod test {
     fn from_toml_string() {
         let toml = r###"
             reviewers = ["k-nasa"]
+            rand_assigne = true
             "###;
 
         let owners = Owners {
             reviewers: vec!["k-nasa".to_string()],
             delete_branch: None,
+            rand_assigne: Some(true),
         };
 
         assert_eq!(owners, toml::from_str(toml).unwrap());
@@ -72,6 +79,7 @@ mod test {
 
         let owners = Owners {
             reviewers: vec!["k-nasa".to_string()],
+            rand_assigne: None,
             delete_branch: Some(true),
         };
 
@@ -82,6 +90,7 @@ mod test {
     fn pick_assignee() {
         let owners = Owners {
             reviewers: vec!["k-nasa".into()],
+            rand_assigne: None,
             delete_branch: None,
         };
 
@@ -93,6 +102,7 @@ mod test {
         let owners = Owners {
             reviewers: vec!["k-nasa".into(), "ai-chan".into()],
             delete_branch: None,
+            rand_assigne: None,
         };
 
         let mut rand_k_nasa = false;
