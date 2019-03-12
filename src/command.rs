@@ -12,6 +12,7 @@ type Assignees = Vec<String>;
 pub enum Command {
     ApprovalPR(BotName),
     UserAssign(Assignees),
+    RandAssign,
 }
 
 impl Command {
@@ -110,7 +111,7 @@ impl Command {
     pub fn parse_command(body: &str) -> Result<Command, failure::Error> {
         let input: Vec<&str> = body
             .lines()
-            .filter(|l| l.contains("r?") || l.contains("r+"))
+            .filter(|l| l.contains("r?") || l.contains("r+") || l.contains("rand?"))
             .collect();
 
         if input.is_empty() {
@@ -133,6 +134,10 @@ impl Command {
             }
 
             return Ok(Command::UserAssign(assignees));
+        }
+
+        if Some(&"rand?") == head.first() {
+            return Ok(Command::RandAssign);
         }
 
         if let Some(botname) = head.first() {
@@ -159,6 +164,13 @@ impl Command {
     pub fn is_approval_pr(&self) -> bool {
         match self {
             Command::ApprovalPR(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_rand_assign(&self) -> bool {
+        match self {
+            Command::RandAssign => true,
             _ => false,
         }
     }
@@ -261,5 +273,12 @@ mod test {
         assert!(Command::parse_command(&body2).is_err());
         assert!(Command::parse_command(&body3).is_err());
         assert!(Command::parse_command(&body4).is_err());
+    }
+
+    #[test]
+    fn should_parse_rand_keyword() {
+        let body = "rand?";
+        let command = Command::RandAssign;
+        assert_eq!(Command::parse_command(&body).unwrap(), command);
     }
 }
