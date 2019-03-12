@@ -44,6 +44,8 @@ fn exec_command_rand_assignee_to_pr(number: u32, repository: Repository) -> AICh
     let assignees = owners.pick_assignee();
     let label_name = vec!["S-awaiting-review"];
 
+    add_comment(number, &repository, "Assign reviewers randomly")?;
+
     let assignees: Vec<String> = if let Some(assignee) = assignees {
         vec![assignee.to_string()]
     } else {
