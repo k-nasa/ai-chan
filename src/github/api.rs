@@ -4,6 +4,7 @@ use crate::github::pull_request::*;
 use crate::github::Repository;
 use crate::owners::Owners;
 use crate::AIChannResult;
+use hubcaps::comments::CommentOptions;
 use hubcaps::{Credentials, Github};
 use tokio::runtime::Runtime;
 
@@ -158,6 +159,25 @@ pub fn add_label(number: u32, repository: &Repository, labels: Vec<&str>) -> AIC
 
     if result.is_err() {
         failure::bail!("Failed add labels");
+    }
+
+    Ok(())
+}
+
+pub fn add_comment(number: u32, repository: &Repository, comment: &str) -> AIChannResult {
+    let repo = repository.repo_tuple();
+    let github = github_client_setup!();
+
+    let issue = github.repo(repo.0, repo.1).issues().get(number as u64);
+    let f = issue.comments().create(&CommentOptions {
+        body: comment.to_string(),
+    });
+
+    let mut rt = Runtime::new()?;
+    let result = rt.block_on(f);
+
+    if result.is_err() {
+        failure::bail!("Failed add comment");
     }
 
     Ok(())
