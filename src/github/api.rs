@@ -22,7 +22,7 @@ macro_rules! github_client_setup {
 }
 
 pub fn delete_branch(owners: Owners, repo: &str, number: u32) -> AIChannResult {
-    if owners.is_some_true() {
+    if !owners.is_some_true() {
         info!("delete_branch setting is nothing");
         return Ok(());
     }
