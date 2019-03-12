@@ -93,10 +93,15 @@ impl Command {
         }
 
         let number = issue_comment_event.issue.number;
+        let repository = issue_comment_event.repository.clone();
         let repo = issue_comment_event.repository.full_name.clone();
 
         merge_repository(issue_comment_event)?;
-        delete_branch(owners, &repo, number)?;
+
+        if owners.is_delete_branch_some_true() {
+            add_comment(number, &repository, "Delete branch automatically")?;
+            delete_branch(owners, &repo, number)?;
+        }
 
         Ok(())
     }

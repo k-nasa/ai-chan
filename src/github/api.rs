@@ -23,11 +23,6 @@ macro_rules! github_client_setup {
 }
 
 pub fn delete_branch(owners: Owners, repo: &str, number: u32) -> AIChannResult {
-    if !owners.is_delete_branch_some_true() {
-        info!("delete_branch setting is nothing");
-        return Ok(());
-    }
-
     let repo = repo.split('/').collect::<Vec<&str>>();
     let github = github_client_setup!();
 
