@@ -6,7 +6,7 @@ pub mod pull_request;
 
 use serde_derive::*;
 
-#[derive(Deserialize, PartialEq, Debug)]
+#[derive(Deserialize, PartialEq, Debug, Clone)]
 pub struct Repository {
     // XXX add getter
     pub id: u32,
@@ -22,7 +22,7 @@ impl Repository {
     }
 }
 
-#[derive(Deserialize, PartialEq, Debug)]
+#[derive(Deserialize, PartialEq, Debug, Clone)]
 pub struct User {
     pub id: u32,
     pub login: String,

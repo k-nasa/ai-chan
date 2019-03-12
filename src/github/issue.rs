@@ -19,7 +19,7 @@ pub enum IssueAction {
     Deleted,
     #[serde(rename = "transferred")]
     Transferred,
-    #[serde(rename = "println!")]
+    #[serde(rename = "pinned")]
     Pinned,
     #[serde(rename = "unpinned")]
     Unpinned,
