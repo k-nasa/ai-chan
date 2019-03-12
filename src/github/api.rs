@@ -2,7 +2,6 @@ use crate::config::Config;
 use crate::github::issue_comment::*;
 use crate::github::pull_request::*;
 use crate::github::Repository;
-use crate::owners::Owners;
 use crate::AIChannResult;
 use hubcaps::comments::CommentOptions;
 use hubcaps::{Credentials, Github};
@@ -22,7 +21,7 @@ macro_rules! github_client_setup {
     };
 }
 
-pub fn delete_branch(owners: Owners, repo: &str, number: u32) -> AIChannResult {
+pub fn delete_branch(repo: &str, number: u32) -> AIChannResult {
     let repo = repo.split('/').collect::<Vec<&str>>();
     let github = github_client_setup!();
 

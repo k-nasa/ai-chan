@@ -100,7 +100,7 @@ impl Command {
 
         if owners.is_delete_branch_some_true() {
             add_comment(number, &repository, "Delete branch automatically")?;
-            delete_branch(owners, &repo, number)?;
+            delete_branch(&repo, number)?;
         }
 
         Ok(())
