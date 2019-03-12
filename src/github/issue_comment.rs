@@ -1,7 +1,7 @@
 use crate::github::{Repository, User};
 use serde_derive::*;
 
-#[derive(Deserialize, PartialEq, Debug)]
+#[derive(Deserialize, PartialEq, Debug, Clone)]
 pub struct IssueCommentEvent {
     pub action: IssueCommentAction,
     pub issue: Issue,
@@ -9,7 +9,7 @@ pub struct IssueCommentEvent {
     pub repository: Repository,
 }
 
-#[derive(Deserialize, PartialEq, Debug)]
+#[derive(Deserialize, PartialEq, Debug, Clone)]
 pub enum IssueCommentAction {
     #[serde(rename = "created")]
     Created,
@@ -19,7 +19,7 @@ pub enum IssueCommentAction {
     Deleted,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq, Clone)]
 pub struct Issue {
     pub id: u32,
     pub url: String,
@@ -28,7 +28,7 @@ pub struct Issue {
     pub body: String,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq, Clone)]
 pub struct Comment {
     pub id: u32,
     pub issue_url: String,

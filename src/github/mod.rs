@@ -22,7 +22,7 @@ impl Repository {
     }
 }
 
-#[derive(Deserialize, PartialEq, Debug)]
+#[derive(Deserialize, PartialEq, Debug, Clone)]
 pub struct User {
     pub id: u32,
     pub login: String,
