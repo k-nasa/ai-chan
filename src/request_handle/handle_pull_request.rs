@@ -1,7 +1,5 @@
 use crate::command::Command;
-use crate::github::api::*;
 use crate::github::pull_request::{PullRequestAction, PullRequestEvent};
-use crate::github::Repository;
 use crate::owners::Owners;
 use crate::AIChannResult;
 
@@ -21,7 +19,7 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
 
     let owners = Owners::from_repository(&pull_request_event.repository.full_name)?;
     if owners.rand_assigne() && parse_result.is_err() {
-        exec_command_rand_assignee_to_pr(
+        Command::exec_command_rand_assignee_to_pr(
             pull_request_event.pull_request.number,
             pull_request_event.repository,
         )?;
@@ -34,28 +32,16 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
             pull_request_event.pull_request.number,
             pull_request_event.repository,
         )?;
+        return Ok(());
     }
 
-    Ok(())
-}
-
-fn exec_command_rand_assignee_to_pr(number: u32, repository: Repository) -> AIChannResult {
-    let owners = Owners::from_repository(&repository.full_name)?;
-    let assignees = owners.pick_assignee();
-    let label_name = vec!["S-awaiting-review"];
-
-    add_comment(number, &repository, "Assign reviewers randomly")?;
-
-    let assignees: Vec<String> = if let Some(assignee) = assignees {
-        vec![assignee.to_string()]
-    } else {
-        failure::bail!("Unset reviewers")
-    };
-
-    add_assignees_to_pr(number, &repository, &assignees)?;
-    add_label(number, &repository, label_name)?;
-
-    info!("Add assignees {:?} to PullRequest#{}", &assignees, number);
+    if command.is_rand_assign() {
+        Command::exec_command_rand_assignee_to_pr(
+            pull_request_event.pull_request.number,
+            pull_request_event.repository,
+        )?;
+        return Ok(());
+    }
 
     Ok(())
 }
