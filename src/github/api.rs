@@ -176,3 +176,18 @@ pub fn add_comment(number: u32, repository: &Repository, comment: &str) -> AICha
 
     Ok(())
 }
+
+pub fn fetch_pull_request(
+    number: u32,
+    repository: &Repository,
+) -> Result<PullRequest, failure::Error> {
+    let repo = repository.repo_tuple();
+    let github = github_client_setup!();
+    let mut rt = Runtime::new()?;
+
+    let pull: PullRequest = rt
+        .block_on(github.get(&format!("/repos/{}/{}/pulls/{}", repo.0, repo.1, number)))
+        .unwrap();
+
+    Ok(pull)
+}
