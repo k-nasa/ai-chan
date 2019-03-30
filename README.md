@@ -24,6 +24,13 @@ This is an operation bot to do these things automatically for your project on Gi
 
 - You can use this to merge pull request
 
+### ```rand?```
+- You can assign reviewers randomly
+
+### ```merge+ branch_name```
+- You can merge the latest upstream branch
+- The default branch name is master
+
 ## Setup
 
 ### Build and Launch application
