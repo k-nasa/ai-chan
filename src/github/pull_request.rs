@@ -49,6 +49,7 @@ pub struct PullRequest {
     pub body: String,
     pub head: Head,
     pub base: Base,
+    pub mergeable: Option<bool>,
 }
 #[derive(Deserialize, PartialEq, Debug)]
 pub struct Base {
@@ -94,6 +95,7 @@ mod test {
                 id: 1,
                 url: "https://api.github.com/repos/Codertocat/Hello-World/pulls/1".to_owned(),
                 number: 1,
+                mergeable: Some(true),
                 state: PullRequestState::Closed,
                 locked: false,
                 title: "Update the README with new information".to_owned(),

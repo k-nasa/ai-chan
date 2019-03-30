@@ -3,6 +3,7 @@ pub mod github_event;
 pub mod issue;
 pub mod issue_comment;
 pub mod pull_request;
+pub mod push_event;
 
 use serde_derive::*;
 
