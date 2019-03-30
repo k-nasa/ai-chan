@@ -148,7 +148,7 @@ impl Command {
         if Some(&"merge+") == head.first() {
             let branch_name = tail.first().unwrap_or(&"master");
 
-            return Ok(Command::MergeUpstream(branch_name.to_string())
+            return Ok(Command::MergeUpstream(branch_name.to_string()));
         }
 
         if let Some(botname) = head.first() {
