@@ -3,12 +3,14 @@ use rocket::request::{FromRequest, Outcome, Request};
 const X_GITHUB_EVENT: &str = "X-GitHub-Event";
 const X_HUB_SIGNATURE: &str = "X-Hub-Signature";
 
+const PUSH_EVENT: &str = "push";
 const ISSUE_EVENT: &str = "issues";
 const ISSUE_COMMENT_EVENT: &str = "issue_comment";
 const PULL_REQUEST_EVENT: &str = "pull_request";
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum GitHubEvent {
+    Push,
     Issue,
     IssueComment,
     PullRequest,
@@ -34,6 +36,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for GitHubEvent {
             ISSUE_EVENT => GitHubEvent::Issue,
             ISSUE_COMMENT_EVENT => GitHubEvent::IssueComment,
             PULL_REQUEST_EVENT => GitHubEvent::PullRequest,
+            PUSH_EVENT => GitHubEvent::Push,
             _ => {
                 return Outcome::Failure((
                     rocket::http::Status::BadRequest,
@@ -114,5 +117,18 @@ mod test {
 
         assert!(event.is_success());
         assert_eq!(event.unwrap(), GitHubEvent::PullRequest);
+    }
+
+    #[test]
+    fn test_from_request_push() {
+        let client = Client::new(rocket(Config::default())).expect("valid rocket instance");
+
+        let header = Header::new("X-GitHub-Event", "push");
+        let request = client.post("/").header(header).body("test");
+
+        let event = GitHubEvent::from_request(&request.inner());
+
+        assert!(event.is_success());
+        assert_eq!(event.unwrap(), GitHubEvent::Push);
     }
 }

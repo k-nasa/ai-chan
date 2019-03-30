@@ -184,7 +184,6 @@ pub fn fetch_pull_request(
     let repo = repository.repo_tuple();
     let github = github_client_setup!();
     let mut rt = Runtime::new()?;
-
     let pull: PullRequest = rt
         .block_on(github.get(&format!("/repos/{}/{}/pulls/{}", repo.0, repo.1, number)))
         .unwrap();
@@ -215,4 +214,28 @@ pub fn merge_branch(
     }
 
     Ok(())
+}
+
+type PullRequests = Vec<PullRequest>;
+pub fn fetch_all_pulls_numbers(repository: &Repository) -> Result<Vec<u32>, failure::Error> {
+    let repo = repository.repo_tuple();
+    let github = github_client_setup!();
+
+    let mut rt = Runtime::new()?;
+    let result: Result<PullRequests, _> =
+        rt.block_on(github.get(&format!("/repos/{}/{}/pulls", repo.0, repo.1)));
+
+    if result.is_err() {
+        failure::bail!("Failed merge branch: {:?}", result);
+    }
+
+    let pulls = result.unwrap();
+
+    let mut numbers = Vec::new();
+
+    for pull in pulls {
+        numbers.push(pull.number);
+    }
+
+    Ok(numbers)
 }
