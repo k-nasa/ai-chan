@@ -191,3 +191,28 @@ pub fn fetch_pull_request(
 
     Ok(pull)
 }
+
+pub fn merge_branch(
+    base_branch: &str,
+    head_branch: &str,
+    repository: &Repository,
+) -> AIChannResult {
+    let repo = repository.repo_tuple();
+    let github = github_client_setup!();
+
+    let mut map = std::collections::HashMap::new();
+    map.insert("base", base_branch);
+    map.insert("head", head_branch);
+
+    let mut rt = Runtime::new()?;
+    let result: Result<serde_json::Value, _> = rt.block_on(github.post(
+        &format!("/repos/{}/{}/merges", repo.0, repo.1),
+        serde_json::to_vec(&map)?,
+    ));
+
+    if result.is_err() {
+        failure::bail!("Failed merge branch: {:?}", result);
+    }
+
+    Ok(())
+}
