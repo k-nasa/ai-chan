@@ -12,26 +12,21 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
 
     let command = Command::parse_command(&issue_comment_event.comment.body)?;
 
-    if command.is_user_assign() {
-        command.exec_command_assignee_to_pr(
+    match command {
+        Command::UserAssign(_) => command.exec_command_assignee_to_pr(
             issue_comment_event.issue.number,
             issue_comment_event.repository,
-        )?;
-        return Ok(());
-    };
-
-    if command.is_approval_pr() {
-        command.exec_command_approval(issue_comment_event.clone())?;
-        return Ok(());
-    }
-
-    if command.is_rand_assign() {
-        Command::exec_command_rand_assignee_to_pr(
+        )?,
+        Command::ApprovalPR(_) => command.exec_command_approval(issue_comment_event.clone())?,
+        Command::RandAssign => Command::exec_command_rand_assignee_to_pr(
             issue_comment_event.issue.number,
             issue_comment_event.repository,
-        )?;
-
-        return Ok(());
+        )?,
+        Command::MergeUpstream(base_branch) => Command::exec_command_merge_upstream(
+            base_branch,
+            issue_comment_event.repository,
+            issue_comment_event.issue.number,
+        )?,
     }
 
     Ok(())
