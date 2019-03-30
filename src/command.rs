@@ -7,12 +7,14 @@ use crate::AIChannResult;
 
 type BotName = String;
 type Assignees = Vec<String>;
+type BranchName = String;
 
 #[derive(PartialEq, Debug)]
 pub enum Command {
     ApprovalPR(BotName),
     UserAssign(Assignees),
     RandAssign,
+    MergeUpstream(BranchName),
 }
 
 impl Command {
@@ -112,7 +114,9 @@ impl Command {
     pub fn parse_command(body: &str) -> Result<Command, failure::Error> {
         let input: Vec<&str> = body
             .lines()
-            .filter(|l| l.contains("r?") || l.contains("r+") || l.contains("rand?"))
+            .filter(|l| {
+                l.contains("r?") || l.contains("r+") || l.contains("rand?") || l.contains("merge+")
+            })
             .collect();
 
         if input.is_empty() {
@@ -139,6 +143,12 @@ impl Command {
 
         if Some(&"rand?") == head.first() {
             return Ok(Command::RandAssign);
+        }
+
+        if Some(&"merge+") == head.first() {
+            let branch_name = tail.first().unwrap_or(&"master");
+
+            return Ok(Command::MergeUpstream(branch_name.to_string())
         }
 
         if let Some(botname) = head.first() {
@@ -187,6 +197,13 @@ impl Command {
         match self {
             Command::ApprovalPR(b) => Some(b),
             _ => None,
+        }
+    }
+
+    pub fn is_merge_upstream(self) -> bool {
+        match self {
+            Command::MergeUpstream(_) => true,
+            _ => false,
         }
     }
 }
@@ -280,6 +297,22 @@ mod test {
     fn should_parse_rand_keyword() {
         let body = "rand?";
         let command = Command::RandAssign;
+        assert_eq!(Command::parse_command(&body).unwrap(), command);
+    }
+
+    #[test]
+    fn should_parse_maege_upstream() {
+        let body = "merge+";
+        let command = Command::MergeUpstream("master".to_string());
+
+        assert_eq!(Command::parse_command(&body).unwrap(), command);
+    }
+
+    #[test]
+    fn should_parse_maege_upstream_when_include_branch() {
+        let body = "merge+ branch";
+        let command = Command::MergeUpstream("branch".to_string());
+
         assert_eq!(Command::parse_command(&body).unwrap(), command);
     }
 }
