@@ -22,7 +22,11 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
             issue_comment_event.issue.number,
             issue_comment_event.repository,
         )?,
-        Command::MergeUpstream(_) => (),
+        Command::MergeUpstream(base_branch) => Command::exec_command_merge_upstream(
+            base_branch,
+            issue_comment_event.repository,
+            issue_comment_event.issue.number,
+        )?,
     }
 
     Ok(())

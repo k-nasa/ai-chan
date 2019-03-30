@@ -110,6 +110,34 @@ impl Command {
         Ok(())
     }
 
+    pub fn exec_command_merge_upstream(
+        head_branch: String,
+        repository: Repository,
+        number: u32,
+    ) -> AIChannResult {
+        let pr = fetch_pull_request(number, &repository)?;
+        let base_branch = pr.head.ref_string;
+
+        add_comment(
+            number,
+            &repository,
+            &format!("Try auto merge {} into {}", base_branch, head_branch),
+        )?;
+
+        if merge_branch(&base_branch, &head_branch, &repository).is_err() {
+            add_comment(
+                number,
+                &repository,
+                &format!(
+                    "Sorry. Failed auto merge {} into {} :sob",
+                    base_branch, head_branch
+                ),
+            )?;
+        }
+
+        Ok(())
+    }
+
     // FIXME 可読性が低い
     pub fn parse_command(body: &str) -> Result<Command, failure::Error> {
         let input: Vec<&str> = body
