@@ -70,7 +70,7 @@ pub fn add_assignees_to_issue(
 ) -> AIChannResult {
     let repo = repository.repo_tuple();
     let github = github_client_setup!();
-    let assignees: Vec<&str> = assignees.iter().map(|s| s.as_ref()).collect();
+    let assignees: Vec<&str> = assignees.iter().map(std::convert::AsRef::as_ref).collect();
 
     let mut rt = Runtime::new()?;
     rt.block_on(
@@ -93,7 +93,7 @@ pub fn add_assignees_to_pr(
 ) -> AIChannResult {
     let repo = repository.repo_tuple();
     let github = github_client_setup!();
-    let assignees: Vec<&str> = assignees.iter().map(|s| s.as_ref()).collect();
+    let assignees: Vec<&str> = assignees.iter().map(std::convert::AsRef::as_ref).collect();
 
     let mut rt = Runtime::new()?;
     rt.block_on(
@@ -116,7 +116,7 @@ pub fn add_reviewers_to_pr(
 ) -> AIChannResult {
     let repo = repository.repo_tuple();
     let github = github_client_setup!();
-    let reviewers: Vec<&str> = reviewers.iter().map(|s| s.as_ref()).collect();
+    let reviewers: Vec<&str> = reviewers.iter().map(std::convert::AsRef::as_ref).collect();
 
     let mut map = std::collections::HashMap::new();
     map.insert("reviewers", reviewers);
@@ -162,7 +162,7 @@ pub fn add_comment(number: u32, repository: &Repository, comment: &str) -> AICha
     let repo = repository.repo_tuple();
     let github = github_client_setup!();
 
-    let issue = github.repo(repo.0, repo.1).issues().get(number as u64);
+    let issue = github.repo(repo.0, repo.1).issues().get(u64::from(number));
     let f = issue.comments().create(&CommentOptions {
         body: comment.to_string(),
     });

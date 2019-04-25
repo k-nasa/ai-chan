@@ -19,6 +19,7 @@ pub enum IssueCommentAction {
     Deleted,
 }
 
+// FIXME move module
 #[derive(Deserialize, Debug, PartialEq, Clone)]
 pub struct Issue {
     pub id: u32,
@@ -28,6 +29,7 @@ pub struct Issue {
     pub body: String,
 }
 
+// FIXME move module
 #[derive(Deserialize, Debug, PartialEq, Clone)]
 pub struct Comment {
     pub id: u32,

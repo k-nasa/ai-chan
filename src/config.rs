@@ -82,14 +82,14 @@ fn home_dir_string() -> Result<String, failure::Error> {
 impl Default for Config {
     fn default() -> Self {
         let port = std::env::var("PORT")
-            .unwrap_or("80".to_owned())
+            .unwrap_or_else(|_| "80".to_owned())
             .parse()
             .unwrap();
 
         Config {
             port,
             address: "0.0.0.0".to_owned(),
-            botname: std::env::var("BOTNAME").unwrap_or("ai-chan".to_owned()),
+            botname: std::env::var("BOTNAME").unwrap_or_else(|_| "ai-chan".to_owned()),
             github_api_key: std::env::var("GITHUB_API_KEY").unwrap_or_default(),
             secret: std::env::var("WEBHOOK_SECRET").unwrap_or_default(),
         }

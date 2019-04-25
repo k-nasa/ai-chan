@@ -20,7 +20,7 @@ mod test {
         let event2 = PushEvent {
             ref_string: "refs/tags/simple-tag".to_string(),
             repository: Repository {
-                id: 135493233,
+                id: 135_493_233,
                 name: "Hello-World".to_string(),
                 full_name: "Codertocat/Hello-World".to_string(),
             },
