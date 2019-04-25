@@ -228,7 +228,7 @@ impl Command {
         }
     }
 
-    pub fn is_merge_upstream(self) -> bool {
+    pub fn is_merge_upstream(&self) -> bool {
         match self {
             Command::MergeUpstream(_) => true,
             _ => false,
