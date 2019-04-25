@@ -7,6 +7,7 @@ pub mod push_event;
 
 use serde_derive::*;
 
+// FIXME move module
 #[derive(Deserialize, PartialEq, Debug, Clone)]
 pub struct Repository {
     // XXX add getter
@@ -23,6 +24,7 @@ impl Repository {
     }
 }
 
+// FIXME move module
 #[derive(Deserialize, PartialEq, Debug, Clone)]
 pub struct User {
     pub id: u32,
