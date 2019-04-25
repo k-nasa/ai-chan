@@ -159,7 +159,7 @@ impl Command {
                 .iter()
                 .filter(|a| a.starts_with('@'))
                 .map(|a| a.trim_start_matches('@'))
-                .map(|a| a.to_owned())
+                .map(std::borrow::ToOwned::to_owned)
                 .collect();
 
             if assignees.is_empty() {

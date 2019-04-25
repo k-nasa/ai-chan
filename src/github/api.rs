@@ -70,7 +70,7 @@ pub fn add_assignees_to_issue(
 ) -> AIChannResult {
     let repo = repository.repo_tuple();
     let github = github_client_setup!();
-    let assignees: Vec<&str> = assignees.iter().map(|s| s.as_ref()).collect();
+    let assignees: Vec<&str> = assignees.iter().map(std::convert::AsRef::as_ref).collect();
 
     let mut rt = Runtime::new()?;
     rt.block_on(
@@ -93,7 +93,7 @@ pub fn add_assignees_to_pr(
 ) -> AIChannResult {
     let repo = repository.repo_tuple();
     let github = github_client_setup!();
-    let assignees: Vec<&str> = assignees.iter().map(|s| s.as_ref()).collect();
+    let assignees: Vec<&str> = assignees.iter().map(std::convert::AsRef::as_ref).collect();
 
     let mut rt = Runtime::new()?;
     rt.block_on(
@@ -116,7 +116,7 @@ pub fn add_reviewers_to_pr(
 ) -> AIChannResult {
     let repo = repository.repo_tuple();
     let github = github_client_setup!();
-    let reviewers: Vec<&str> = reviewers.iter().map(|s| s.as_ref()).collect();
+    let reviewers: Vec<&str> = reviewers.iter().map(std::convert::AsRef::as_ref).collect();
 
     let mut map = std::collections::HashMap::new();
     map.insert("reviewers", reviewers);
