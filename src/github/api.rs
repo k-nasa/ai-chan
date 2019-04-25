@@ -162,7 +162,7 @@ pub fn add_comment(number: u32, repository: &Repository, comment: &str) -> AICha
     let repo = repository.repo_tuple();
     let github = github_client_setup!();
 
-    let issue = github.repo(repo.0, repo.1).issues().get(number as u64);
+    let issue = github.repo(repo.0, repo.1).issues().get(u64::from(number));
     let f = issue.comments().create(&CommentOptions {
         body: comment.to_string(),
     });
