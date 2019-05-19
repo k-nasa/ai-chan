@@ -31,8 +31,8 @@ fn main() {
     let config = match crate::config::Config::load_config() {
         Ok(c) => c,
         Err(e) => {
-            warn!("Failed load config file: {}", e);
-            warn!("Using default config");
+            error!("Failed load config file: {}", e);
+            error!("Using default config");
             crate::config::Config::default()
         }
     };
