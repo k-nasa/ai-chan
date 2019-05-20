@@ -24,4 +24,9 @@ tokio = "0.1"
 toml = "0.5"
 rust-crypto = "0.2.36"
 rand = "0.6"
-tide = "0.2.0"
+tide = { git = "https://github.com/rustasync/tide" }
+
+[patch.crates-io]
+http-service = { git = "https://github.com/rustasync/http-service", branch = "master" }
+http-service-hyper = { git = "https://github.com/rustasync/http-service", branch = "master" }
+http-service-mock = { git = "https://github.com/rustasync/http-service", branch = "master" }
