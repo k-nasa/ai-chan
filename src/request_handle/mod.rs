@@ -16,6 +16,7 @@ pub fn handle_github_webhook(event: GitHubEvent, json_string: &str) -> AIChannRe
         GitHubEvent::IssueComment => handle_issue_comment::exec(payload_json)?,
         GitHubEvent::Issue => handle_issue::exec(payload_json)?,
         GitHubEvent::Push => handle_push::exec(payload_json)?,
+        GitHubEvent::Other => failure::bail!("unsupport event"),
     }
 
     Ok(())

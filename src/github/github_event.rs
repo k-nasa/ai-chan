@@ -14,6 +14,19 @@ pub enum GitHubEvent {
     Issue,
     IssueComment,
     PullRequest,
+    Other,
+}
+
+impl From<String> for GitHubEvent {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            ISSUE_EVENT => GitHubEvent::Issue,
+            ISSUE_COMMENT_EVENT => GitHubEvent::IssueComment,
+            PULL_REQUEST_EVENT => GitHubEvent::PullRequest,
+            PUSH_EVENT => GitHubEvent::Push,
+            _ => GitHubEvent::Other,
+        }
+    }
 }
 
 impl<'a, 'r> FromRequest<'a, 'r> for GitHubEvent {

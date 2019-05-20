@@ -1,5 +1,4 @@
-#![feature(proc_macro_hygiene, decl_macro)]
-#![feature(type_alias_enum_variants)]
+#![feature(async_await, type_alias_enum_variants, proc_macro_hygiene, decl_macro)]
 
 mod command;
 mod config;
@@ -23,6 +22,9 @@ use rocket::{
     get, post, routes, Data,
 };
 use std::io::Read;
+
+const X_GITHUB_EVENT: &str = "X-GitHub-Event";
+const X_HUB_SIGNATURE: &str = "X-Hub-Signature";
 
 fn main() {
     std::env::set_var("RUST_LOG", "ai_chan");
@@ -50,53 +52,43 @@ fn main() {
     );
     info!("===================================================");
 
-    rocket(config).launch();
+    let mut app = tide::App::new();
+
+    app.at("/").get(async move |_| "running server");
+    app.at("/github").post(github);
+    app.run(format!("{}:{}", config.address(), config.port())).unwrap();
 }
 
-fn rocket(config: crate::config::Config) -> rocket::Rocket {
-    let config = rocket::config::Config::build(Environment::Production)
-        .address(config.address())
-        .port(*config.port() as u16)
-        .log_level(LoggingLevel::Off)
-        .finalize()
-        .unwrap();
+async fn github(mut cx: tide::Context<()>) {
 
-    rocket::custom(config).mount("/", routes![index, github])
-}
+    let ( event, sign ) = {
+        let header = cx.headers();
+        let event = header.get(X_GITHUB_EVENT);
+        let sign = header.get(X_HUB_SIGNATURE);
+        if event.is_none() {
+            warn!("event header is nothing");
+            return;
+        }
 
-#[get("/")]
-fn index() -> &'static str {
-    // FIXME どうせなら使い方を出したほうが良いのでは？
-    "Hello, world!"
-}
+        if sign.is_none() {
+            error!("sign header is nothing");
+            return;
+        }
 
-#[post("/github", format = "application/json", data = "<payload>")]
-fn github(signe: Result<Signe, Error>, event: Result<GitHubEvent, Error>, payload: Data) {
-    if let Err(e) = event {
-        warn!("{}", e);
-        return;
-    }
-
-    if let Err(e) = signe {
-        error!("{}", e);
-        return;
-    }
-
-    let mut json_string = String::new();
-    if payload.open().read_to_string(&mut json_string).is_err() {
-        error!("Bad request. failed read payload.");
-        return;
+        let event_string = event.unwrap().to_str().unwrap().to_string();
+        (event_string, sign.unwrap().to_str().unwrap())
     };
 
-    let config = Config::load_config().unwrap_or_default();
-    let signature = signe.unwrap().0;
+    let json_string: String = cx.body_string().await.unwrap();
 
-    if !config.is_secret_valid(&signature, &json_string) {
-        error!("Invalid signe.");
-        return;
-    }
+    // let config = Config::load_config().unwrap_or_default();
 
-    let result = handle_github_webhook(event.unwrap(), &json_string);
+    // if !config.is_secret_valid(sign, &json_string) {
+    //     error!("Invalid signe.");
+    //     return;
+    // }
+
+    let result = handle_github_webhook(GitHubEvent::from(event), &json_string);
 
     match result {
         Ok(_) => info!("Sucess request handle"),
