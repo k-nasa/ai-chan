@@ -20,7 +20,7 @@ dependencies = [
 name = "ai-chan"
 version = "0.1.0"
 dependencies = [
- "dirs 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "dirs 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "hubcaps 0.5.0 (git+https://github.com/k-nasa/hubcaps)",
  "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -271,9 +271,19 @@ dependencies = [
 
 [[package]]
 name = "dirs"
-version = "1.0.5"
+version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
+ "cfg-if 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "dirs-sys 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "dirs-sys"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "cfg-if 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.48 (registry+https://github.com/rust-lang/crates.io-index)",
  "redox_users 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1828,7 +1838,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum devise 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "74e04ba2d03c5fa0d954c061fc8c9c288badadffc272ebb87679a89846de3ed3"
 "checksum devise_codegen 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "066ceb7928ca93a9bedc6d0e612a8a0424048b0ab1f75971b203d01420c055d7"
 "checksum devise_core 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "cf41c59b22b5e3ec0ea55c7847e5f358d340f3a8d6d53a5cf4f1564967f96487"
-"checksum dirs 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)" = "3fd78930633bd1c6e35c4b42b1df7b0cbc6bc191146e512bb3bedf243fcc3901"
+"checksum dirs 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e07ec6ad2c793a14517d70f1b7043ed5a9403f4f785a799032da6a7bcdd80ddb"
+"checksum dirs-sys 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "73bb611ac139e1bd12463cfad795e5d615144c4973ccc2329d8900a9ade944de"
 "checksum env_logger 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)" = "afb070faf94c85d17d50ca44f6ad076bce18ae92f0037d350947240a36e9d42e"
 "checksum error-chain 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)" = "07e791d3be96241c77c43846b665ef1384606da2cd2a48730abe606a12906e02"
 "checksum failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "795bd83d3abeb9220f257e597aa0080a508b27533824adf336529648f6abf7e2"
