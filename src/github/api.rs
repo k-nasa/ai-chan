@@ -1,14 +1,17 @@
 use crate::config::Config;
 use crate::github::issue_comment::*;
-use serde::de::DeserializeOwned;
 use crate::github::pull_request::*;
 use crate::github::Repository;
 use crate::AIChannResult;
-use tokio::runtime::Runtime;
+use serde::de::DeserializeOwned;
 use surf::{http, url};
+use tokio::runtime::Runtime;
 
-async fn github_client<T: DeserializeOwned>(method: http::Method, url: &str) -> Result<T, Box<dyn std::error::Error + Send + Sync>>{
-    let url = url::Url::parse(&format!("https://api.github.com{}",url))?;
+async fn github_client<T: DeserializeOwned>(
+    method: http::Method,
+    url: &str,
+) -> Result<T, Box<dyn std::error::Error + Send + Sync>> {
+    let url = url::Url::parse(&format!("https://api.github.com{}", url))?;
 
     // FIXME 毎回ファイル読み込みが走る
     let token = Config::load_config()
@@ -18,7 +21,8 @@ async fn github_client<T: DeserializeOwned>(method: http::Method, url: &str) -> 
 
     surf::Request::new(method, url)
         .set_header("Authorization", format!("token {}", token))
-        .recv_json().await
+        .recv_json()
+        .await
 }
 
 pub async fn delete_branch(repo: &str, number: u32) -> AIChannResult {
@@ -27,7 +31,8 @@ pub async fn delete_branch(repo: &str, number: u32) -> AIChannResult {
     let pull: PullRequest = github_client(
         http::method::POST,
         &format!("/repos/{}/{}/pulls/{}", repo[0], repo[1], number),
-    ).await?;
+    )
+    .await?;
 
     info!("{}", pull.head.ref_string);
 

@@ -15,7 +15,7 @@ extern crate pretty_env_logger;
 type AIChannResult = Result<(), Box<dyn std::error::Error + Send + Sync + 'static>>;
 
 use crate::config::Config;
-use github::github_event::{GitHubEvent};
+use github::github_event::GitHubEvent;
 use request_handle::handle_github_webhook;
 
 fn main() {
@@ -64,7 +64,7 @@ async fn github(cx: tide::Context<()>) {
         Err(_) => {
             error!("Bad request. failed read payload.");
             return;
-        },
+        }
         Ok(s) => s,
     };
 
@@ -82,4 +82,3 @@ async fn github(cx: tide::Context<()>) {
         Err(e) => error!("Failed request handle: {}", e),
     }
 }
-
