@@ -10,13 +10,11 @@ description = "A helpful operation bot for GitHub. It helps assign reviewers and
 edition = "2018"
 
 [dependencies]
+tide = {git="https://github.com/rustasync/tide"}
 dirs = "2.0"
 failure = "0.1"
-hubcaps = { git = "https://github.com/k-nasa/hubcaps", version="^0.5.0" }
 log = "0.4"
 pretty_env_logger = "0.3"
-rocket = "0.4"
-rocket_contrib = "0.4"
 serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"
