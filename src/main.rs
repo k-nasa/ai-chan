@@ -15,14 +15,8 @@ extern crate pretty_env_logger;
 type AIChannResult = Result<(), failure::Error>;
 
 use crate::config::Config;
-use failure::Error;
-use github::github_event::{GitHubEvent, Signe};
+use github::github_event::{GitHubEvent};
 use request_handle::handle_github_webhook;
-use rocket::{
-    config::{Environment, LoggingLevel},
-    get, post, routes, Data,
-};
-use std::io::Read;
 
 fn main() {
     std::env::set_var("RUST_LOG", "ai_chan");
@@ -50,53 +44,38 @@ fn main() {
     );
     info!("===================================================");
 
-    rocket(config).launch();
+    let mut app = tide::App::new();
+    app.at("/ping").get(|_| async move { "pong!" });
+    app.at("/github").post(github);
+
+    app.run("127.0.0.1:8000");
 }
 
-fn rocket(config: crate::config::Config) -> rocket::Rocket {
-    let config = rocket::config::Config::build(Environment::Production)
-        .address(config.address())
-        .port(*config.port() as u16)
-        .log_level(LoggingLevel::Off)
-        .finalize()
-        .unwrap();
+async fn github(cx: tide::Context<()>) {
+    const X_GITHUB_EVENT: &str = "X-GitHub-Event";
+    const X_HUB_SIGNATURE: &str = "X-Hub-Signature";
 
-    rocket::custom(config).mount("/", routes![index, github])
-}
+    // TODO refactor
+    let signature = cx.headers().get(X_HUB_SIGNATURE).unwrap().to_str().unwrap();
+    let event_string = String::from(cx.headers().get(X_GITHUB_EVENT).unwrap().to_str().unwrap());
+    let event = GitHubEvent::from(event_string);
 
-#[get("/")]
-fn index() -> &'static str {
-    // FIXME どうせなら使い方を出したほうが良いのでは？
-    "Hello, world!"
-}
-
-#[post("/github", format = "application/json", data = "<payload>")]
-fn github(signe: Result<Signe, Error>, event: Result<GitHubEvent, Error>, payload: Data) {
-    if let Err(e) = event {
-        warn!("{}", e);
-        return;
-    }
-
-    if let Err(e) = signe {
-        error!("{}", e);
-        return;
-    }
-
-    let mut json_string = String::new();
-    if payload.open().read_to_string(&mut json_string).is_err() {
-        error!("Bad request. failed read payload.");
-        return;
+    let json_string = match cx.body_string().await {
+        Err(_) => {
+            error!("Bad request. failed read payload.");
+            return;
+        },
+        Ok(s) => s,
     };
 
     let config = Config::load_config().unwrap_or_default();
-    let signature = signe.unwrap().0;
 
     if !config.is_secret_valid(&signature, &json_string) {
         error!("Invalid signe.");
         return;
     }
 
-    let result = handle_github_webhook(event.unwrap(), &json_string);
+    let result = handle_github_webhook(event, &json_string);
 
     match result {
         Ok(_) => info!("Sucess request handle"),
@@ -104,19 +83,3 @@ fn github(signe: Result<Signe, Error>, event: Result<GitHubEvent, Error>, payloa
     }
 }
 
-#[cfg(test)]
-mod test {
-    use super::*;
-    use crate::config::Config;
-    use rocket::http::Status;
-    use rocket::local::Client;
-
-    #[test]
-    fn test_index() {
-        let client = Client::new(rocket(Config::default())).expect("valid rocket instance");
-
-        let mut response = client.get("/").dispatch();
-        assert_eq!(response.status(), Status::Ok);
-        assert_eq!(response.body_string(), Some("Hello, world!".into()));
-    }
-}
