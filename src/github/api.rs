@@ -8,7 +8,7 @@ use tokio::runtime::Runtime;
 use surf::{http, url};
 
 async fn github_client<T: DeserializeOwned>(method: http::Method, url: &str) -> Result<T, Box<dyn std::error::Error + Send + Sync>>{
-    let url = url::Url::parse(url)?;
+    let url = url::Url::parse(&format!("https://api.github.com{}",url))?;
 
     // FIXME 毎回ファイル読み込みが走る
     let token = Config::load_config()
