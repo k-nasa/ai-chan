@@ -1,34 +1,33 @@
 use crate::config::Config;
 use crate::github::issue_comment::*;
+use serde::de::DeserializeOwned;
 use crate::github::pull_request::*;
 use crate::github::Repository;
 use crate::AIChannResult;
-use hubcaps::comments::CommentOptions;
-use hubcaps::{Credentials, Github};
 use tokio::runtime::Runtime;
+use surf::{http, url};
 
-macro_rules! github_client_setup {
-    () => {
-        Github::new(
-            concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
-            Credentials::Token(
-                Config::load_config()
-                    .unwrap_or_default()
-                    .github_api_key()
-                    .to_owned(),
-            ),
-        )
-    };
+async fn github_client<T: DeserializeOwned>(method: http::Method, url: &str) -> Result<T, Box<dyn std::error::Error + Send + Sync>>{
+    let url = url::Url::parse(url)?;
+
+    // FIXME 毎回ファイル読み込みが走る
+    let token = Config::load_config()
+        .unwrap_or_default()
+        .github_api_key()
+        .to_string();
+
+    surf::Request::new(method, url)
+        .set_header("Authorization", format!("token {}", token))
+        .recv_json().await
 }
 
-pub fn delete_branch(repo: &str, number: u32) -> AIChannResult {
+pub async fn delete_branch(repo: &str, number: u32) -> AIChannResult {
     let repo = repo.split('/').collect::<Vec<&str>>();
-    let github = github_client_setup!();
 
-    let mut rt = Runtime::new()?;
-    let pull: PullRequest = rt
-        .block_on(github.get(&format!("/repos/{}/{}/pulls/{}", repo[0], repo[1], number)))
-        .unwrap();
+    let pull: PullRequest = github_client(
+        http::method::POST,
+        &format!("/repos/{}/{}/pulls/{}", repo[0], repo[1], number),
+    ).await?;
 
     info!("{}", pull.head.ref_string);
 

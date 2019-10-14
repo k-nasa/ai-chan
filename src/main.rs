@@ -12,7 +12,7 @@ mod test_support;
 extern crate log;
 extern crate pretty_env_logger;
 
-type AIChannResult = Result<(), failure::Error>;
+type AIChannResult = Result<(), Box<dyn std::error::Error + Send + Sync + 'static>>;
 
 use crate::config::Config;
 use github::github_event::{GitHubEvent};
