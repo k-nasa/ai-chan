@@ -5,6 +5,7 @@ use crate::github::Repository;
 use crate::{AIChannResult, Error};
 
 use surf::{http, http::method::Method, url};
+use std::collections::HashMap;
 use tokio::runtime::Runtime;
 
 fn github_client(
@@ -61,47 +62,33 @@ pub(crate) async fn merge_repository(issue_comment_event: IssueCommentEvent) -> 
     Ok(())
 }
 
-pub fn add_assignees_to_issue(
+pub async fn add_assignees_to_issue(
     number: u32,
     repository: &Repository,
     assignees: &[String],
 ) -> AIChannResult {
     let repo = repository.repo_tuple();
     let assignees: Vec<&str> = assignees.iter().map(std::convert::AsRef::as_ref).collect();
+    let mut body = HashMap::new();
+    body.insert("assignees", assignees);
 
-    let mut rt = Runtime::new()?;
-    rt.block_on(
-        github
-            .repo(repo.0, repo.1)
-            .issues()
-            .get(number.into())
-            .assignees()
-            .add(assignees),
-    )
-    .unwrap(); //FIXME unwrap()
+    github_client(Method::PATCH, format!("/repos/{}/{}/issues/{}", repo.0, repo.1, number))?.body_json(&body)?.recv_string().await?;
 
     Ok(())
 }
 
-pub fn add_assignees_to_pr(
+pub(crate) async fn add_assignees_to_pr(
     number: u32,
     repository: &Repository,
     assignees: &[String],
 ) -> AIChannResult {
+    /// FIXME 一旦add_assignees_to_issueをコピペ。違いはないはずなので、どっちかを消して良さそう
     let repo = repository.repo_tuple();
-    let github = github_client_setup!();
     let assignees: Vec<&str> = assignees.iter().map(std::convert::AsRef::as_ref).collect();
+    let mut body = HashMap::new();
+    body.insert("assignees", assignees);
 
-    let mut rt = Runtime::new()?;
-    rt.block_on(
-        github
-            .repo(repo.0, repo.1)
-            .pulls()
-            .get(number.into())
-            .assignees()
-            .add(assignees),
-    )
-    .unwrap(); //FIXME unwrap()
+    github_client(Method::PATCH, format!("/repos/{}/{}/issues/{}", repo.0, repo.1, number))?.body_json(&body)?.recv_string().await?;
 
     Ok(())
 }
