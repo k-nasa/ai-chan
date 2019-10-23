@@ -103,21 +103,12 @@ pub(crate) async fn add_label(number: u32, repository: &Repository, labels: Vec<
     Ok(())
 }
 
-pub fn add_comment(number: u32, repository: &Repository, comment: &str) -> AIChannResult {
+pub(crate) async fn add_comment(number: u32, repository: &Repository, comment: &str) -> AIChannResult {
     let repo = repository.repo_tuple();
-    let github = github_client_setup!();
+    let mut body = HashMap::new();
+    body.insert("body", comment);
 
-    let issue = github.repo(repo.0, repo.1).issues().get(u64::from(number));
-    let f = issue.comments().create(&CommentOptions {
-        body: comment.to_string(),
-    });
-
-    let mut rt = Runtime::new()?;
-    let result = rt.block_on(f);
-
-    if result.is_err() {
-        failure::bail!("Failed add comment");
-    }
+    github_client(Method::POST, format!("/repos/{}/{}/issues/{}/comments", repo.0, repo.1, number))?.body_json(&body)?.recv_string().await?;
 
     Ok(())
 }
