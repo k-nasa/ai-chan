@@ -3,7 +3,7 @@ use crate::github::pull_request::{PullRequestAction, PullRequestEvent};
 use crate::owners::Owners;
 use crate::AIChannResult;
 
-pub fn exec(json: serde_json::Value) -> AIChannResult {
+pub async fn exec(json: serde_json::Value) -> AIChannResult {
     let pull_request_event: PullRequestEvent = serde_json::from_value(json)?;
 
     if pull_request_event.action != PullRequestAction::Opened {
@@ -17,12 +17,13 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
 
     let parse_result = Command::parse_command(&pull_request_event.pull_request.body);
 
-    let owners = Owners::from_repository(&pull_request_event.repository.full_name)?;
+    let owners = Owners::from_repository(&pull_request_event.repository.full_name).await?;
+
     if owners.rand_assigne() && parse_result.is_err() {
         Command::exec_command_rand_assignee_to_pr(
             pull_request_event.pull_request.number,
             pull_request_event.repository,
-        )?;
+        ).await?;
         return Ok(());
     }
 
@@ -31,7 +32,7 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
         command.exec_command_assignee_to_pr(
             pull_request_event.pull_request.number,
             pull_request_event.repository,
-        )?;
+        ).await?;
         return Ok(());
     }
 
@@ -39,7 +40,7 @@ pub fn exec(json: serde_json::Value) -> AIChannResult {
         Command::exec_command_rand_assignee_to_pr(
             pull_request_event.pull_request.number,
             pull_request_event.repository,
-        )?;
+        ).await?;
         return Ok(());
     }
 

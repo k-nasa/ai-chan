@@ -3,7 +3,7 @@ use crate::github::api::*;
 use crate::github::issue_comment::*;
 use crate::github::Repository;
 use crate::owners::Owners;
-use crate::AIChannResult;
+use crate::{AIChannResult, AIChanError};
 
 type BotName = String;
 type Assignees = Vec<String>;
@@ -18,45 +18,46 @@ pub enum Command {
 }
 
 impl Command {
-    pub fn exec_command_assignee_to_pr(self, number: u32, repository: Repository) -> AIChannResult {
+    pub async fn exec_command_assignee_to_pr(self, number: u32, repository: Repository) -> AIChannResult {
         let user_assign = self.user_assign();
 
         if user_assign.is_none() {
-            failure::bail!("Faild parse command");
+            return Err(Box::new(AIChanError("Faild parse command".to_string())))
         }
 
         let assignees = user_assign.unwrap();
         let label_name = vec!["S-awaiting-review"];
 
-        add_assignees_to_pr(number, &repository, &assignees)?;
-        add_label(number, &repository, label_name)?;
+        add_assignees_to_pr(number, &repository, &assignees).await?;
+        add_label(number, &repository, label_name).await?;
 
         info!("Add assignees {:?} to PullRequest#{}", &assignees, number);
 
         Ok(())
     }
-    pub fn exec_command_rand_assignee_to_pr(number: u32, repository: Repository) -> AIChannResult {
-        let owners = Owners::from_repository(&repository.full_name)?;
+
+    pub async fn exec_command_rand_assignee_to_pr(number: u32, repository: Repository) -> AIChannResult {
+        let owners = Owners::from_repository(&repository.full_name).await?;
         let assignees = owners.pick_assignee();
         let label_name = vec!["S-awaiting-review"];
 
-        add_comment(number, &repository, "Assign reviewers randomly")?;
+        add_comment(number, &repository, "Assign reviewers randomly").await?;
 
         let assignees: Vec<String> = if let Some(assignee) = assignees {
             vec![assignee.to_string()]
         } else {
-            failure::bail!("Unset reviewers")
+            return Err(Box::new(AIChanError("Unset reviewers".to_string())))
         };
 
-        add_assignees_to_pr(number, &repository, &assignees)?;
-        add_label(number, &repository, label_name)?;
+        add_assignees_to_pr(number, &repository, &assignees).await?;
+        add_label(number, &repository, label_name).await?;
 
         info!("Add assignees {:?} to PullRequest#{}", &assignees, number);
 
         Ok(())
     }
 
-    pub fn exec_command_assignee_to_issue(
+    pub async fn exec_command_assignee_to_issue(
         self,
         number: u32,
         repository: Repository,
@@ -64,67 +65,67 @@ impl Command {
         let user_assign = self.user_assign();
 
         if user_assign.is_none() {
-            failure::bail!("Faild parse command");
+            return Err(Box::new(AIChanError("Failed parse command".to_string())))
         }
 
         let assignees = user_assign.unwrap();
 
-        add_assignees_to_issue(number, &repository, &assignees)?;
+        add_assignees_to_issue(number, &repository, &assignees).await?;
 
         info!("Add assignees {:?} to PullRequest#{}", &assignees, number);
 
         Ok(())
     }
 
-    pub fn exec_command_approval(self, issue_comment_event: IssueCommentEvent) -> AIChannResult {
+    pub async fn exec_command_approval(self, issue_comment_event: IssueCommentEvent) -> AIChannResult {
         let botname = self.approval_pr();
         if botname.is_none() {
-            failure::bail!("Faild parse command");
+            return Err(Box::new(AIChanError("Failed parse command".to_string())))
         }
 
         let botname = botname.unwrap();
         let config = Config::load_config().unwrap_or_default();
         if botname != config.botname() {
-            failure::bail!("Invalid botname");
+            return Err(Box::new(AIChanError("Invalid botname".to_string())))
         }
 
         let repository_full_name = &issue_comment_event.repository.full_name;
         let username = &issue_comment_event.comment.user.login;
 
-        let owners = Owners::from_repository(repository_full_name)?;
+        let owners = Owners::from_repository(repository_full_name).await?;
         if !owners.reviewers.iter().any(|r| username == r) {
-            failure::bail!("No merge permission");
+            return Err(Box::new(AIChanError("No merge permission".to_string())))
         }
 
         let number = issue_comment_event.issue.number;
         let repository = issue_comment_event.repository.clone();
         let repo = issue_comment_event.repository.full_name.clone();
 
-        merge_repository(issue_comment_event)?;
+        merge_repository(issue_comment_event).await?;
 
         if owners.is_delete_branch_some_true() {
-            add_comment(number, &repository, "Delete branch automatically")?;
-            delete_branch(&repo, number)?;
+            add_comment(number, &repository, "Delete branch automatically").await?;
+            delete_branch(&repo, number).await?;
         }
 
         Ok(())
     }
 
-    pub fn exec_command_merge_upstream(
+    pub async fn exec_command_merge_upstream(
         head_branch: String,
         repository: Repository,
         number: u32,
     ) -> AIChannResult {
-        let pr = fetch_pull_request(number, &repository)?;
+        let pr = fetch_pull_request(number, &repository).await?;
         let base_branch = pr.head.ref_string;
 
         add_comment(
             number,
             &repository,
             &format!("Try auto merge {} into {}", base_branch, head_branch),
-        )?;
+        ).await?;
 
-        if merge_branch(&base_branch, &head_branch, &repository).is_err() {
+        if merge_branch(&base_branch, &head_branch, &repository).await.is_err() {
             add_comment(
                 number,
                 &repository,
@@ -132,14 +133,14 @@ impl Command {
                     "Sorry. Failed auto merge {} into {} :sob",
                     base_branch, head_branch
                 ),
-            )?;
+            ).await?;
         }
 
         Ok(())
     }
 
     // FIXME 可読性が低い
-    pub fn parse_command(body: &str) -> Result<Command, failure::Error> {
+    pub fn parse_command(body: &str) -> Result<Command, crate::Error> {
         let input: Vec<&str> = body
             .lines()
             .filter(|l| {
@@ -148,7 +149,7 @@ impl Command {
             .collect();
 
         if input.is_empty() {
-            failure::bail!("Not input")
+            return Err(Box::new(AIChanError("Not input".to_string())))
         }
 
         let command_line: Vec<&str> = input[0].split_whitespace().collect();
@@ -163,7 +164,7 @@ impl Command {
                 .collect();
 
             if assignees.is_empty() {
-                failure::bail!("Not Found username")
+                return Err(Box::new(AIChanError("Not Found username".to_string())))
             }
 
             return Ok(Command::UserAssign(assignees));
@@ -181,7 +182,7 @@ impl Command {
 
         if let Some(botname) = head.first() {
             if !botname.starts_with('@') {
-                failure::bail!("Not Found valid command")
+                return Err(Box::new(AIChanError("Not Found valid command".to_string())))
             }
 
             if tail[0] == "r+" {
@@ -190,7 +191,7 @@ impl Command {
             }
         }
 
-        failure::bail!("Not Found valid command")
+        return Err(Box::new(AIChanError("Not Found valid command".to_string())))
     }
 
     pub fn is_user_assign(&self) -> bool {
