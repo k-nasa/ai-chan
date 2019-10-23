@@ -104,8 +104,9 @@ impl Command {
         merge_repository(issue_comment_event).await?;
 
         if owners.is_delete_branch_some_true() {
+            let result = delete_branch(&repo, number).await;
+            debug!("{:?}", result);
             add_comment(number, &repository, "Delete branch automatically").await?;
-            delete_branch(&repo, number).await?;
         }
 
         Ok(())

@@ -10,6 +10,8 @@ pub async fn exec(json: serde_json::Value) -> AIChannResult {
         return Ok(());
     }
 
+    debug!("{:?}", issue_comment_event.comment.body);
+
     let command = Command::parse_command(&issue_comment_event.comment.body)?;
 
     match command {

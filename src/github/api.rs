@@ -33,17 +33,17 @@ pub(crate) async fn delete_branch(repo: &str, number: u32) -> AIChannResult {
     .recv_json()
     .await?;
 
-    info!("{}", pull.head.ref_string);
-
-    github_client(
+    let res = github_client(
         Method::DELETE,
         format!(
-            "repos/{}/{}/git/refs/{}",
+            "/repos/{}/{}/git/refs/heads/{}",
             repo[0], repo[1], pull.head.ref_string
         ),
     )?
-    .recv_json()
+    .recv_string()
     .await?;
+
+    debug!("delete_branch response: {}", res);
 
     Ok(())
 }
@@ -52,12 +52,14 @@ pub(crate) async fn merge_repository(issue_comment_event: IssueCommentEvent) -> 
     let repo = issue_comment_event.repository.repo_tuple();
     let number = issue_comment_event.issue.number;
 
-    github_client(
+    let response = github_client(
         Method::PUT,
-        format!("/repos/{}/{}/puls/{}/merge", repo.0, repo.1, number),
+        format!("/repos/{}/{}/pulls/{}/merge", repo.0, repo.1, number),
     )?
     .recv_string()
     .await?;
+
+    debug!("merge_repository response: {}", response);
 
     Ok(())
 }
