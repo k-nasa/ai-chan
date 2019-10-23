@@ -24,3 +24,4 @@ surf = { git = "https://github.com/rustasync/surf" }
 tide = {git="https://github.com/rustasync/tide"}
 tokio = "0.1"
 toml = "0.5"
+base64 = "0.10.1"
