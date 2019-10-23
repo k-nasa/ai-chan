@@ -1,5 +1,6 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 #![feature(type_alias_enum_variants)]
+#![feature(async_closure)]
 
 mod command;
 mod config;
