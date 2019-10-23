@@ -6,7 +6,6 @@ use crate::{AIChannResult, Error};
 
 use std::collections::HashMap;
 use surf::{http, http::method::Method, url};
-use tokio::runtime::Runtime;
 
 fn github_client(
     method: http::Method,
@@ -15,6 +14,7 @@ fn github_client(
     let url = url::Url::parse(&format!("https://api.github.com{}", url))?;
 
     // FIXME 毎回ファイル読み込みが走る
+    // TODO lazy_static化する
     let token = Config::load_config()
         .unwrap_or_default()
         .github_api_key()
