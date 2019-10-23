@@ -4,7 +4,7 @@ pub enum GitHubEvent {
     Issue,
     IssueComment,
     PullRequest,
-    Iregal,
+    Iregal(String),
 }
 
 impl From<String> for GitHubEvent {
@@ -19,7 +19,7 @@ impl From<String> for GitHubEvent {
             ISSUE_COMMENT_EVENT => GitHubEvent::IssueComment,
             PULL_REQUEST_EVENT => GitHubEvent::PullRequest,
             PUSH_EVENT => GitHubEvent::Push,
-            _ => GitHubEvent::Iregal,
+            _ => GitHubEvent::Iregal(s),
         }
     }
 }
