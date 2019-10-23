@@ -1,5 +1,4 @@
 use crate::config::Config;
-use hubcaps::{Credentials, Github};
 use rand::Rng;
 use serde_derive::*;
 use tokio::runtime::Runtime;

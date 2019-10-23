@@ -76,7 +76,7 @@ async fn github(cx: tide::Context<()>) {
         return;
     }
 
-    let result = handle_github_webhook(event, &json_string);
+    let result = handle_github_webhook(event, &json_string).await;
 
     match result {
         Ok(_) => info!("Sucess request handle"),

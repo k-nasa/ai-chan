@@ -3,7 +3,7 @@ use crate::github::issue::*;
 use crate::AIChannResult;
 use serde_json::Value;
 
-pub fn exec(json: Value) -> AIChannResult {
+pub async fn exec(json: Value) -> AIChannResult {
     let issue_event: IssueEvent = serde_json::from_value(json)?;
 
     if issue_event.action != IssueAction::Opened {

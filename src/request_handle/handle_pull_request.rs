@@ -3,7 +3,7 @@ use crate::github::pull_request::{PullRequestAction, PullRequestEvent};
 use crate::owners::Owners;
 use crate::AIChannResult;
 
-pub fn exec(json: serde_json::Value) -> AIChannResult {
+pub async fn exec(json: serde_json::Value) -> AIChannResult {
     let pull_request_event: PullRequestEvent = serde_json::from_value(json)?;
 
     if pull_request_event.action != PullRequestAction::Opened {
