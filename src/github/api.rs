@@ -82,7 +82,7 @@ pub(crate) async fn add_assignees_to_pr(
     repository: &Repository,
     assignees: &[String],
 ) -> AIChannResult {
-    /// FIXME 一旦add_assignees_to_issueをコピペ。違いはないはずなので、どっちかを消して良さそう
+    // FIXME 一旦add_assignees_to_issueをコピペ。違いはないはずなので、どっちかを消して良さそう
     let repo = repository.repo_tuple();
     let assignees: Vec<&str> = assignees.iter().map(std::convert::AsRef::as_ref).collect();
     let mut body = HashMap::new();
