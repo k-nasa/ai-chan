@@ -68,7 +68,7 @@ fn main() {
     app.run("127.0.0.1:8000");
 }
 
-async fn github(cx: tide::Context<()>) {
+async fn github(mut cx: tide::Context<()>) {
     const X_GITHUB_EVENT: &str = "X-GitHub-Event";
     const X_HUB_SIGNATURE: &str = "X-Hub-Signature";
 

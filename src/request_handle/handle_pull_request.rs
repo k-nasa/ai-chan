@@ -23,7 +23,7 @@ pub async fn exec(json: serde_json::Value) -> AIChannResult {
         Command::exec_command_rand_assignee_to_pr(
             pull_request_event.pull_request.number,
             pull_request_event.repository,
-        )?;
+        ).await?;
         return Ok(());
     }
 
@@ -40,7 +40,7 @@ pub async fn exec(json: serde_json::Value) -> AIChannResult {
         Command::exec_command_rand_assignee_to_pr(
             pull_request_event.pull_request.number,
             pull_request_event.repository,
-        )?;
+        ).await?;
         return Ok(());
     }
 
