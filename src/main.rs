@@ -77,10 +77,11 @@ async fn github(cx: tide::Context<()>) {
         return;
     }
 
-    let result = handle_github_webhook(event, &json_string).await;
-
-    match result {
-        Ok(_) => info!("Sucess request handle"),
-        Err(e) => error!("Failed request handle: {}", e),
-    }
+    async_std::task::block_on(async {
+        let result = handle_github_webhook(event, json_string).await;
+        match result {
+            Ok(_) => info!("Sucess request handle"),
+            Err(e) => error!("Failed request handle: {}", e),
+        }
+    })
 }
