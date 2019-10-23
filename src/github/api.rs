@@ -148,19 +148,16 @@ pub(crate) async fn merge_branch(
 }
 
 type PullRequests = Vec<PullRequest>;
-pub fn fetch_all_pulls_numbers(repository: &Repository) -> Result<Vec<u32>, failure::Error> {
+pub(crate) async fn fetch_all_pulls_numbers(repository: &Repository) -> Result<Vec<u32>, Error> {
     let repo = repository.repo_tuple();
-    let github = github_client_setup!();
 
-    let mut rt = Runtime::new()?;
-    let result: Result<PullRequests, _> =
-        rt.block_on(github.get(&format!("/repos/{}/{}/pulls", repo.0, repo.1)));
+    let pulls: Vec<PullRequest> = github_client(
+        Method::GET,
+        format!("/repos/{}/{}/pulls", repo.0, repo.1),
+    )?
+        .recv_json()
+        .await?;
 
-    if result.is_err() {
-        failure::bail!("Failed merge branch: {:?}", result);
-    }
-
-    let pulls = result.unwrap();
 
     let mut numbers = Vec::new();
 
