@@ -19,7 +19,7 @@ impl Owners {
 
         let token = config.github_api_key().to_string();
 
-        let url = format!("/repos/{}/{}/owners.toml", repo[0], repo[1]);
+        let url = format!("/repos/{}/{}/contents/owners.toml", repo[0], repo[1]);
         let url = url::Url::parse(&format!("https://api.github.com{}", url))?;
 
         let client = surf::Request::new(Method::GET, url)
@@ -27,9 +27,14 @@ impl Owners {
 
         let response_json: serde_json::value::Value = client.recv_json().await?;
 
-        let content: &str = response_json.get("content").unwrap().as_str().unwrap();
+        let content: &str = match response_json.get("content") {
+            None =>  return Err(Box::new(crate::AIChanError("Faild import owners.toml".to_string()))),
+            Some(c) => c.as_str().unwrap(),
+        };
 
-        let owners = toml::from_str(content)?;
+        let content = base64::decode(&content.replace("\n", ""))?;
+        let content = String::from_utf8(content)?;
+        let owners = toml::from_str(&content)?;
 
         Ok(owners)
     }

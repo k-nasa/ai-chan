@@ -73,7 +73,12 @@ async fn github(mut cx: tide::Context<()>) {
     const X_HUB_SIGNATURE: &str = "X-Hub-Signature";
 
     // TODO refactor
-    let event_string = String::from(cx.headers().get(X_GITHUB_EVENT).unwrap().to_str().unwrap());
+    let event_string = match cx.headers().get(X_GITHUB_EVENT) {
+        None => return error!("unsetted {}", X_GITHUB_EVENT),
+        Some(s) => s.to_str().unwrap()
+    };
+
+    let event_string = String::from(event_string);
     let event = GitHubEvent::from(event_string);
 
     let json_string = match cx.body_string().await {
