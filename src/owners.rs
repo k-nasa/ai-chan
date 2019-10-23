@@ -1,7 +1,9 @@
 use crate::config::Config;
+use crate::Error;
+
 use rand::Rng;
 use serde_derive::*;
-use tokio::runtime::Runtime;
+use surf::{http::method::Method, url};
 
 #[derive(Deserialize, Serialize, Debug, PartialEq)]
 pub struct Owners {
@@ -11,25 +13,23 @@ pub struct Owners {
 }
 
 impl Owners {
-    pub fn from_repository(repository_full_name: &str) -> Result<Self, failure::Error> {
+    pub async fn from_repository(repository_full_name: &str) -> Result<Self, Error> {
         let repo = repository_full_name.split('/').collect::<Vec<&str>>();
         let config = Config::load_config().unwrap_or_default();
-        let github = Github::new(
-            concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION")),
-            Credentials::Token(config.github_api_key().to_owned()),
-        );
 
-        let mut rt = Runtime::new()?;
-        let file = rt.block_on(github.repo(repo[0], repo[1]).content().file("owners.toml"));
+        let token = config.github_api_key().to_string();
 
-        if let Err(e) = file {
-            failure::bail!("failed import owners.toml:{}", e);
-        }
+        let url = format!("/repos/{}/{}/owners.toml", repo[0], repo[1]);
+        let url = url::Url::parse(&format!("https://api.github.com{}", url))?;
 
-        let content: Vec<u8> = file.unwrap().content.into();
-        let content = String::from_utf8(content)?;
+        let client = surf::Request::new(Method::GET, url)
+            .set_header("Authorization", format!("token {}", token));
 
-        let owners = toml::from_str(&content)?;
+        let response_json: serde_json::value::Value = client.recv_json().await?;
+
+        let content: &str = response_json.get("content").unwrap().as_str().unwrap();
+
+        let owners = toml::from_str(content)?;
 
         Ok(owners)
     }
