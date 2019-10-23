@@ -17,7 +17,8 @@ pub async fn exec(json: serde_json::Value) -> AIChannResult {
 
     let parse_result = Command::parse_command(&pull_request_event.pull_request.body);
 
-    let owners = Owners::from_repository(&pull_request_event.repository.full_name)?;
+    let owners = Owners::from_repository(&pull_request_event.repository.full_name).await?;
+
     if owners.rand_assigne() && parse_result.is_err() {
         Command::exec_command_rand_assignee_to_pr(
             pull_request_event.pull_request.number,
