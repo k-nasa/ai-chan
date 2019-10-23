@@ -4,14 +4,13 @@ use crate::github::pull_request::*;
 use crate::github::Repository;
 use crate::{AIChannResult, Error};
 
-use surf::{http, url, http::method::Method};
+use surf::{http, http::method::Method, url};
 use tokio::runtime::Runtime;
 
 fn github_client(
     method: http::Method,
     url: String,
-) -> Result<surf::Request<impl surf::middleware::HttpClient>, Error>
-{
+) -> Result<surf::Request<impl surf::middleware::HttpClient>, Error> {
     let url = url::Url::parse(&format!("https://api.github.com{}", url))?;
 
     // FIXME 毎回ファイル読み込みが走る
@@ -20,9 +19,7 @@ fn github_client(
         .github_api_key()
         .to_string();
 
-    Ok(surf::Request::new(method, url)
-        .set_header("Authorization", format!("token {}", token))
-    )
+    Ok(surf::Request::new(method, url).set_header("Authorization", format!("token {}", token)))
 }
 
 pub(crate) async fn delete_branch(repo: &str, number: u32) -> AIChannResult {
@@ -31,14 +28,21 @@ pub(crate) async fn delete_branch(repo: &str, number: u32) -> AIChannResult {
     let pull: PullRequest = github_client(
         Method::GET,
         format!("/repos/{}/{}/pulls/{}", repo[0], repo[1], number),
-    )?.recv_json().await?;
+    )?
+    .recv_json()
+    .await?;
 
     info!("{}", pull.head.ref_string);
 
     github_client(
         Method::DELETE,
-        format!("repos/{}/{}/git/refs/{}", repo[0], repo[1], pull.head.ref_string)
-    )?.recv_json().await?;
+        format!(
+            "repos/{}/{}/git/refs/{}",
+            repo[0], repo[1], pull.head.ref_string
+        ),
+    )?
+    .recv_json()
+    .await?;
 
     Ok(())
 }
@@ -49,8 +53,10 @@ pub(crate) async fn merge_repository(issue_comment_event: IssueCommentEvent) -> 
 
     github_client(
         Method::PUT,
-        format!("/repos/{}/{}/puls/{}/merge", repo.0, repo.1, number)
-    )?.recv_string().await?;
+        format!("/repos/{}/{}/puls/{}/merge", repo.0, repo.1, number),
+    )?
+    .recv_string()
+    .await?;
 
     Ok(())
 }
