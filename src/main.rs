@@ -1,6 +1,6 @@
 #![feature(proc_macro_hygiene, decl_macro)]
-#![feature(type_alias_enum_variants)]
 #![feature(async_closure)]
+#![type_length_limit="1522768"]
 
 mod command;
 mod config;
@@ -73,7 +73,6 @@ async fn github(mut cx: tide::Context<()>) {
     const X_HUB_SIGNATURE: &str = "X-Hub-Signature";
 
     // TODO refactor
-    let signature = cx.headers().get(X_HUB_SIGNATURE).unwrap().to_str().unwrap();
     let event_string = String::from(cx.headers().get(X_GITHUB_EVENT).unwrap().to_str().unwrap());
     let event = GitHubEvent::from(event_string);
 
@@ -87,6 +86,7 @@ async fn github(mut cx: tide::Context<()>) {
 
     let config = Config::load_config().unwrap_or_default();
 
+    let signature = cx.headers().get(X_HUB_SIGNATURE).unwrap().to_str().unwrap();
     if !config.is_secret_valid(&signature, &json_string) {
         error!("Invalid signe.");
         return;
