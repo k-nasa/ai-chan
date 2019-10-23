@@ -2,15 +2,16 @@ use crate::config::Config;
 use crate::github::issue_comment::*;
 use crate::github::pull_request::*;
 use crate::github::Repository;
-use crate::AIChannResult;
-use serde::de::DeserializeOwned;
+use crate::{AIChannResult, Error};
+
 use surf::{http, url, http::method::Method};
 use tokio::runtime::Runtime;
 
-async fn github_client<T: DeserializeOwned>(
+fn github_client(
     method: http::Method,
-    url: &str,
-) -> Result<T, Box<dyn std::error::Error + Send + Sync>> {
+    url: String,
+) -> Result<surf::Request<impl surf::middleware::HttpClient>, Error>
+{
     let url = url::Url::parse(&format!("https://api.github.com{}", url))?;
 
     // FIXME 毎回ファイル読み込みが走る
@@ -19,45 +20,37 @@ async fn github_client<T: DeserializeOwned>(
         .github_api_key()
         .to_string();
 
-    surf::Request::new(method, url)
+    Ok(surf::Request::new(method, url)
         .set_header("Authorization", format!("token {}", token))
-        .recv_json()
-        .await
+    )
 }
 
-pub async fn delete_branch(repo: &str, number: u32) -> AIChannResult {
+pub(crate) async fn delete_branch(repo: &str, number: u32) -> AIChannResult {
     let repo = repo.split('/').collect::<Vec<&str>>();
 
     let pull: PullRequest = github_client(
-        Method::POST,
-        &format!("/repos/{}/{}/pulls/{}", repo[0], repo[1], number),
-    )
-    .await?;
+        Method::GET,
+        format!("/repos/{}/{}/pulls/{}", repo[0], repo[1], number),
+    )?.recv_json().await?;
 
     info!("{}", pull.head.ref_string);
 
-    let result =
-        github_client(
-            Method::DELETE,
-            &format!("repos/{}/{}/git/refs/{}", repo[0], repo[1], pull.head.ref_string)
-        ).await?;
+    github_client(
+        Method::DELETE,
+        format!("repos/{}/{}/git/refs/{}", repo[0], repo[1], pull.head.ref_string)
+    )?.recv_json().await?;
 
     Ok(())
 }
 
-pub fn merge_repository(issue_comment_event: IssueCommentEvent) -> AIChannResult {
+pub(crate) async fn merge_repository(issue_comment_event: IssueCommentEvent) -> AIChannResult {
     let repo = issue_comment_event.repository.repo_tuple();
-    let github = github_client_setup!();
+    let number = issue_comment_event.issue.number;
 
-    let mut rt = Runtime::new()?;
-    rt.block_on(
-        github
-            .repo(repo.0, repo.1)
-            .pulls()
-            .get(issue_comment_event.issue.number.into())
-            .merge(),
-    )
-    .unwrap();
+    github_client(
+        Method::PUT,
+        format!("/repos/{}/{}/puls/{}/merge", repo.0, repo.1, number)
+    )?.recv_string().await?;
 
     Ok(())
 }
@@ -68,7 +61,6 @@ pub fn add_assignees_to_issue(
     assignees: &[String],
 ) -> AIChannResult {
     let repo = repository.repo_tuple();
-    let github = github_client_setup!();
     let assignees: Vec<&str> = assignees.iter().map(std::convert::AsRef::as_ref).collect();
 
     let mut rt = Runtime::new()?;
