@@ -4,8 +4,8 @@ use crate::github::pull_request::*;
 use crate::github::Repository;
 use crate::{AIChannResult, Error};
 
-use surf::{http, http::method::Method, url};
 use std::collections::HashMap;
+use surf::{http, http::method::Method, url};
 use tokio::runtime::Runtime;
 
 fn github_client(
@@ -72,7 +72,13 @@ pub async fn add_assignees_to_issue(
     let mut body = HashMap::new();
     body.insert("assignees", assignees);
 
-    github_client(Method::PATCH, format!("/repos/{}/{}/issues/{}", repo.0, repo.1, number))?.body_json(&body)?.recv_string().await?;
+    github_client(
+        Method::PATCH,
+        format!("/repos/{}/{}/issues/{}", repo.0, repo.1, number),
+    )?
+    .body_json(&body)?
+    .recv_string()
+    .await?;
 
     Ok(())
 }
@@ -88,27 +94,53 @@ pub(crate) async fn add_assignees_to_pr(
     let mut body = HashMap::new();
     body.insert("assignees", assignees);
 
-    github_client(Method::PATCH, format!("/repos/{}/{}/issues/{}", repo.0, repo.1, number))?.body_json(&body)?.recv_string().await?;
+    github_client(
+        Method::PATCH,
+        format!("/repos/{}/{}/issues/{}", repo.0, repo.1, number),
+    )?
+    .body_json(&body)?
+    .recv_string()
+    .await?;
 
     Ok(())
 }
 
-pub(crate) async fn add_label(number: u32, repository: &Repository, labels: Vec<&str>) -> AIChannResult {
+pub(crate) async fn add_label(
+    number: u32,
+    repository: &Repository,
+    labels: Vec<&str>,
+) -> AIChannResult {
     let repo = repository.repo_tuple();
     let mut body = HashMap::new();
     body.insert("labels", labels);
 
-    github_client(Method::PATCH, format!("/repos/{}/{}/issues/{}", repo.0, repo.1, number))?.body_json(&body)?.recv_string().await?;
+    github_client(
+        Method::PATCH,
+        format!("/repos/{}/{}/issues/{}", repo.0, repo.1, number),
+    )?
+    .body_json(&body)?
+    .recv_string()
+    .await?;
 
     Ok(())
 }
 
-pub(crate) async fn add_comment(number: u32, repository: &Repository, comment: &str) -> AIChannResult {
+pub(crate) async fn add_comment(
+    number: u32,
+    repository: &Repository,
+    comment: &str,
+) -> AIChannResult {
     let repo = repository.repo_tuple();
     let mut body = HashMap::new();
     body.insert("body", comment);
 
-    github_client(Method::POST, format!("/repos/{}/{}/issues/{}/comments", repo.0, repo.1, number))?.body_json(&body)?.recv_string().await?;
+    github_client(
+        Method::POST,
+        format!("/repos/{}/{}/issues/{}/comments", repo.0, repo.1, number),
+    )?
+    .body_json(&body)?
+    .recv_string()
+    .await?;
 
     Ok(())
 }
@@ -142,7 +174,8 @@ pub(crate) async fn merge_branch(
 
     github_client(Method::POST, format!("/repos/{}/{}/merges", repo.0, repo.1))?
         .body_json(&body)?
-        .recv_string().await?;
+        .recv_string()
+        .await?;
 
     Ok(())
 }
@@ -151,13 +184,10 @@ type PullRequests = Vec<PullRequest>;
 pub(crate) async fn fetch_all_pulls_numbers(repository: &Repository) -> Result<Vec<u32>, Error> {
     let repo = repository.repo_tuple();
 
-    let pulls: Vec<PullRequest> = github_client(
-        Method::GET,
-        format!("/repos/{}/{}/pulls", repo.0, repo.1),
-    )?
-        .recv_json()
-        .await?;
-
+    let pulls: Vec<PullRequest> =
+        github_client(Method::GET, format!("/repos/{}/{}/pulls", repo.0, repo.1))?
+            .recv_json()
+            .await?;
 
     let mut numbers = Vec::new();
 
