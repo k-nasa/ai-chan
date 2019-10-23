@@ -113,16 +113,18 @@ pub(crate) async fn add_comment(number: u32, repository: &Repository, comment: &
     Ok(())
 }
 
-pub fn fetch_pull_request(
+pub(crate) async fn fetch_pull_request(
     number: u32,
     repository: &Repository,
-) -> Result<PullRequest, failure::Error> {
+) -> Result<PullRequest, Error> {
     let repo = repository.repo_tuple();
-    let github = github_client_setup!();
-    let mut rt = Runtime::new()?;
-    let pull: PullRequest = rt
-        .block_on(github.get(&format!("/repos/{}/{}/pulls/{}", repo.0, repo.1, number)))
-        .unwrap();
+
+    let pull: PullRequest = github_client(
+        Method::GET,
+        format!("/repos/{}/{}/pulls/{}", repo.0, repo.1, number),
+    )?
+    .recv_json()
+    .await?;
 
     Ok(pull)
 }
