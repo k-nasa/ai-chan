@@ -16,6 +16,21 @@ extern crate pretty_env_logger;
 type Error = Box<dyn std::error::Error + Send + Sync + 'static>;
 type AIChannResult = Result<(), Error>;
 
+#[derive(Debug, Clone)]
+struct AIChanError(String);
+
+impl std::fmt::Display for AIChanError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(error, {})", self.0)
+    }
+}
+
+impl std::error::Error for AIChanError {
+    fn description(&self) -> &str {
+        &self.0
+    }
+}
+
 use crate::config::Config;
 use github::github_event::GitHubEvent;
 use request_handle::handle_github_webhook;

@@ -3,7 +3,7 @@ use crate::github::api::*;
 use crate::github::issue_comment::*;
 use crate::github::Repository;
 use crate::owners::Owners;
-use crate::AIChannResult;
+use crate::{AIChannResult, AIChanError};
 
 type BotName = String;
 type Assignees = Vec<String>;
@@ -18,23 +18,24 @@ pub enum Command {
 }
 
 impl Command {
-    pub fn exec_command_assignee_to_pr(self, number: u32, repository: Repository) -> AIChannResult {
+    pub async fn exec_command_assignee_to_pr(self, number: u32, repository: Repository) -> AIChannResult {
         let user_assign = self.user_assign();
 
         if user_assign.is_none() {
-            failure::bail!("Faild parse command");
+            return Err(Box::new(AIChanError("Faild parse command".to_string())))
         }
 
         let assignees = user_assign.unwrap();
         let label_name = vec!["S-awaiting-review"];
 
-        add_assignees_to_pr(number, &repository, &assignees)?;
-        add_label(number, &repository, label_name)?;
+        add_assignees_to_pr(number, &repository, &assignees).await?;
+        add_label(number, &repository, label_name).await?;
 
         info!("Add assignees {:?} to PullRequest#{}", &assignees, number);
 
         Ok(())
     }
+
     pub fn exec_command_rand_assignee_to_pr(number: u32, repository: Repository) -> AIChannResult {
         let owners = Owners::from_repository(&repository.full_name)?;
         let assignees = owners.pick_assignee();
