@@ -4,7 +4,7 @@ use crate::github::pull_request::*;
 use crate::github::Repository;
 use crate::AIChannResult;
 use serde::de::DeserializeOwned;
-use surf::{http, url};
+use surf::{http, url, http::method::Method};
 use tokio::runtime::Runtime;
 
 async fn github_client<T: DeserializeOwned>(
@@ -29,23 +29,18 @@ pub async fn delete_branch(repo: &str, number: u32) -> AIChannResult {
     let repo = repo.split('/').collect::<Vec<&str>>();
 
     let pull: PullRequest = github_client(
-        http::method::POST,
+        Method::POST,
         &format!("/repos/{}/{}/pulls/{}", repo[0], repo[1], number),
     )
     .await?;
 
     info!("{}", pull.head.ref_string);
 
-    let result = rt.block_on(
-        github
-            .repo(repo[0], repo[1])
-            .git()
-            .delete_reference(format!("heads/{}", pull.head.ref_string)),
-    );
-
-    if result.is_err() {
-        failure::bail!("Failed delete branch");
-    }
+    let result =
+        github_client(
+            Method::DELETE,
+            &format!("repos/{}/{}/git/refs/{}", repo[0], repo[1], pull.head.ref_string)
+        ).await?;
 
     Ok(())
 }
