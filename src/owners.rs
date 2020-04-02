@@ -28,7 +28,11 @@ impl Owners {
         let response_json: serde_json::value::Value = client.recv_json().await?;
 
         let content: &str = match response_json.get("content") {
-            None =>  return Err(Box::new(crate::AIChanError("Faild import owners.toml".to_string()))),
+            None => {
+                return Err(Box::new(crate::AIChanError(
+                    "Faild import owners.toml".to_string(),
+                )))
+            }
             Some(c) => c.as_str().unwrap(),
         };
 
