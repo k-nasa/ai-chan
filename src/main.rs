@@ -31,7 +31,7 @@ use crate::config::Config;
 use github::github_event::GitHubEvent;
 use request_handle::handle_github_webhook;
 
-fn main() {
+fn main() -> AIChannResult {
     std::env::set_var("RUST_LOG", "ai_chan");
     pretty_env_logger::init();
 
@@ -61,7 +61,7 @@ fn main() {
     app.at("/ping").get(|_| async move { "pong!" });
     app.at("/github").post(github);
 
-    app.run("127.0.0.1:8000");
+    Ok(app.run("127.0.0.1:8000")?)
 }
 
 async fn github(mut cx: tide::Context<()>) {

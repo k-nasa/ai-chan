@@ -3,7 +3,7 @@ use crate::github::api::*;
 use crate::github::issue_comment::*;
 use crate::github::Repository;
 use crate::owners::Owners;
-use crate::{AIChannResult, AIChanError};
+use crate::{AIChanError, AIChannResult};
 
 type BotName = String;
 type Assignees = Vec<String>;
@@ -18,11 +18,15 @@ pub enum Command {
 }
 
 impl Command {
-    pub async fn exec_command_assignee_to_pr(self, number: u32, repository: Repository) -> AIChannResult {
+    pub async fn exec_command_assignee_to_pr(
+        self,
+        number: u32,
+        repository: Repository,
+    ) -> AIChannResult {
         let user_assign = self.user_assign();
 
         if user_assign.is_none() {
-            return Err(Box::new(AIChanError("Faild parse command".to_string())))
+            return Err(Box::new(AIChanError("Faild parse command".to_string())));
         }
 
         let assignees = user_assign.unwrap();
@@ -36,7 +40,10 @@ impl Command {
         Ok(())
     }
 
-    pub async fn exec_command_rand_assignee_to_pr(number: u32, repository: Repository) -> AIChannResult {
+    pub async fn exec_command_rand_assignee_to_pr(
+        number: u32,
+        repository: Repository,
+    ) -> AIChannResult {
         let owners = Owners::from_repository(&repository.full_name).await?;
         let assignees = owners.pick_assignee();
         let label_name = vec!["S-awaiting-review"];
@@ -46,7 +53,7 @@ impl Command {
         let assignees: Vec<String> = if let Some(assignee) = assignees {
             vec![assignee.to_string()]
         } else {
-            return Err(Box::new(AIChanError("Unset reviewers".to_string())))
+            return Err(Box::new(AIChanError("Unset reviewers".to_string())));
         };
 
         add_assignees_to_pr(number, &repository, &assignees).await?;
@@ -65,7 +72,7 @@ impl Command {
         let user_assign = self.user_assign();
 
         if user_assign.is_none() {
-            return Err(Box::new(AIChanError("Failed parse command".to_string())))
+            return Err(Box::new(AIChanError("Failed parse command".to_string())));
         }
 
         let assignees = user_assign.unwrap();
@@ -77,16 +84,19 @@ impl Command {
         Ok(())
     }
 
-    pub async fn exec_command_approval(self, issue_comment_event: IssueCommentEvent) -> AIChannResult {
+    pub async fn exec_command_approval(
+        self,
+        issue_comment_event: IssueCommentEvent,
+    ) -> AIChannResult {
         let botname = self.approval_pr();
         if botname.is_none() {
-            return Err(Box::new(AIChanError("Failed parse command".to_string())))
+            return Err(Box::new(AIChanError("Failed parse command".to_string())));
         }
 
         let botname = botname.unwrap();
         let config = Config::load_config().unwrap_or_default();
         if botname != config.botname() {
-            return Err(Box::new(AIChanError("Invalid botname".to_string())))
+            return Err(Box::new(AIChanError("Invalid botname".to_string())));
         }
 
         let repository_full_name = &issue_comment_event.repository.full_name;
@@ -94,7 +104,7 @@ impl Command {
 
         let owners = Owners::from_repository(repository_full_name).await?;
         if !owners.reviewers.iter().any(|r| username == r) {
-            return Err(Box::new(AIChanError("No merge permission".to_string())))
+            return Err(Box::new(AIChanError("No merge permission".to_string())));
         }
 
         let number = issue_comment_event.issue.number;
@@ -124,9 +134,13 @@ impl Command {
             number,
             &repository,
             &format!("Try auto merge {} into {}", base_branch, head_branch),
-        ).await?;
+        )
+        .await?;
 
-        if merge_branch(&base_branch, &head_branch, &repository).await.is_err() {
+        if merge_branch(&base_branch, &head_branch, &repository)
+            .await
+            .is_err()
+        {
             add_comment(
                 number,
                 &repository,
@@ -134,7 +148,8 @@ impl Command {
                     "Sorry. Failed auto merge {} into {} :sob",
                     base_branch, head_branch
                 ),
-            ).await?;
+            )
+            .await?;
         }
 
         Ok(())
@@ -150,7 +165,7 @@ impl Command {
             .collect();
 
         if input.is_empty() {
-            return Err(Box::new(AIChanError("Not input".to_string())))
+            return Err(Box::new(AIChanError("Not input".to_string())));
         }
 
         let command_line: Vec<&str> = input[0].split_whitespace().collect();
@@ -165,7 +180,7 @@ impl Command {
                 .collect();
 
             if assignees.is_empty() {
-                return Err(Box::new(AIChanError("Not Found username".to_string())))
+                return Err(Box::new(AIChanError("Not Found username".to_string())));
             }
 
             return Ok(Command::UserAssign(assignees));
@@ -183,7 +198,7 @@ impl Command {
 
         if let Some(botname) = head.first() {
             if !botname.starts_with('@') {
-                return Err(Box::new(AIChanError("Not Found valid command".to_string())))
+                return Err(Box::new(AIChanError("Not Found valid command".to_string())));
             }
 
             if tail[0] == "r+" {
@@ -192,19 +207,12 @@ impl Command {
             }
         }
 
-        return Err(Box::new(AIChanError("Not Found valid command".to_string())))
+        return Err(Box::new(AIChanError("Not Found valid command".to_string())));
     }
 
     pub fn is_user_assign(&self) -> bool {
         match self {
             Command::UserAssign(_) => true,
-            _ => false,
-        }
-    }
-
-    pub fn is_approval_pr(&self) -> bool {
-        match self {
-            Command::ApprovalPR(_) => true,
             _ => false,
         }
     }
@@ -227,13 +235,6 @@ impl Command {
         match self {
             Command::ApprovalPR(b) => Some(b),
             _ => None,
-        }
-    }
-
-    pub fn is_merge_upstream(&self) -> bool {
-        match self {
-            Command::MergeUpstream(_) => true,
-            _ => false,
         }
     }
 }

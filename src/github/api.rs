@@ -182,7 +182,6 @@ pub(crate) async fn merge_branch(
     Ok(())
 }
 
-type PullRequests = Vec<PullRequest>;
 pub(crate) async fn fetch_all_pulls_numbers(repository: &Repository) -> Result<Vec<u32>, Error> {
     let repo = repository.repo_tuple();
 
