@@ -1,7 +1,3 @@
-#![feature(proc_macro_hygiene, decl_macro)]
-#![feature(async_closure)]
-#![type_length_limit="1522768"]
-
 mod command;
 mod config;
 mod github;
@@ -75,7 +71,7 @@ async fn github(mut cx: tide::Context<()>) {
     // TODO refactor
     let event_string = match cx.headers().get(X_GITHUB_EVENT) {
         None => return error!("unsetted {}", X_GITHUB_EVENT),
-        Some(s) => s.to_str().unwrap()
+        Some(s) => s.to_str().unwrap(),
     };
 
     let event_string = String::from(event_string);
