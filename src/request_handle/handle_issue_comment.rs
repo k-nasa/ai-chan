@@ -28,15 +28,21 @@ pub async fn exec(json: serde_json::Value) -> AIChannResult {
                 .exec_command_approval(issue_comment_event.clone())
                 .await?
         }
-        Command::RandAssign => Command::exec_command_rand_assignee_to_pr(
-            issue_comment_event.issue.number,
-            issue_comment_event.repository,
-        ).await?,
-        Command::MergeUpstream(base_branch) => Command::exec_command_merge_upstream(
-            base_branch,
-            issue_comment_event.repository,
-            issue_comment_event.issue.number,
-        ).await?,
+        Command::RandAssign => {
+            Command::exec_command_rand_assignee_to_pr(
+                issue_comment_event.issue.number,
+                issue_comment_event.repository,
+            )
+            .await?
+        }
+        Command::MergeUpstream(base_branch) => {
+            Command::exec_command_merge_upstream(
+                base_branch,
+                issue_comment_event.repository,
+                issue_comment_event.issue.number,
+            )
+            .await?
+        }
     }
 
     Ok(())

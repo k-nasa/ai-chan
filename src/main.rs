@@ -1,7 +1,3 @@
-#![feature(proc_macro_hygiene, decl_macro)]
-#![feature(async_closure)]
-#![type_length_limit="1522768"]
-
 mod command;
 mod config;
 mod github;
@@ -35,7 +31,7 @@ use crate::config::Config;
 use github::github_event::GitHubEvent;
 use request_handle::handle_github_webhook;
 
-fn main() {
+fn main() -> AIChannResult {
     std::env::set_var("RUST_LOG", "ai_chan");
     pretty_env_logger::init();
 
@@ -65,7 +61,7 @@ fn main() {
     app.at("/ping").get(|_| async move { "pong!" });
     app.at("/github").post(github);
 
-    app.run("127.0.0.1:8000");
+    Ok(app.run("127.0.0.1:8000")?)
 }
 
 async fn github(mut cx: tide::Context<()>) {
@@ -75,7 +71,7 @@ async fn github(mut cx: tide::Context<()>) {
     // TODO refactor
     let event_string = match cx.headers().get(X_GITHUB_EVENT) {
         None => return error!("unsetted {}", X_GITHUB_EVENT),
-        Some(s) => s.to_str().unwrap()
+        Some(s) => s.to_str().unwrap(),
     };
 
     let event_string = String::from(event_string);

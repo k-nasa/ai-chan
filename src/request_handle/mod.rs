@@ -6,7 +6,10 @@ mod handle_push;
 use crate::github::github_event::GitHubEvent;
 use crate::AIChannResult;
 
-pub(crate) async fn handle_github_webhook(event: GitHubEvent, json_string: String) -> AIChannResult {
+pub(crate) async fn handle_github_webhook(
+    event: GitHubEvent,
+    json_string: String,
+) -> AIChannResult {
     info!("Start hendle {:?} event", event);
 
     let payload_json: serde_json::Value = serde_json::from_str(&json_string)?;
@@ -17,7 +20,7 @@ pub(crate) async fn handle_github_webhook(event: GitHubEvent, json_string: Strin
         GitHubEvent::Issue => handle_issue::exec(payload_json).await?,
         GitHubEvent::Push => handle_push::exec(payload_json).await?,
         // TODO print log
-        GitHubEvent::Iregal(event) => info!("unsuport event: {}", event)
+        GitHubEvent::Iregal(event) => info!("unsuport event: {}", event),
     }
 
     Ok(())

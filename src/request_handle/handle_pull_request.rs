@@ -23,16 +23,19 @@ pub async fn exec(json: serde_json::Value) -> AIChannResult {
         Command::exec_command_rand_assignee_to_pr(
             pull_request_event.pull_request.number,
             pull_request_event.repository,
-        ).await?;
+        )
+        .await?;
         return Ok(());
     }
 
     let command = parse_result?;
     if command.is_user_assign() {
-        command.exec_command_assignee_to_pr(
-            pull_request_event.pull_request.number,
-            pull_request_event.repository,
-        ).await?;
+        command
+            .exec_command_assignee_to_pr(
+                pull_request_event.pull_request.number,
+                pull_request_event.repository,
+            )
+            .await?;
         return Ok(());
     }
 
@@ -40,7 +43,8 @@ pub async fn exec(json: serde_json::Value) -> AIChannResult {
         Command::exec_command_rand_assignee_to_pr(
             pull_request_event.pull_request.number,
             pull_request_event.repository,
-        ).await?;
+        )
+        .await?;
         return Ok(());
     }
 
