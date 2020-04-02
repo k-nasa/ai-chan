@@ -10,17 +10,17 @@ description = "A helpful operation bot for GitHub. It helps assign reviewers and
 edition = "2018"
 
 [dependencies]
-async-std = "0.99.10"
-dirs = "2.0"
-failure = "0.1"
-log = "0.4"
-pretty_env_logger = "0.4"
-rand = "0.6"
+async-std = "1.5.0"
+dirs = "2.0.2"
+failure = "0.1.7"
+log = "0.4.8"
+pretty_env_logger = "0.4.0"
+rand = "0.7.3"
 rust-crypto = "0.2.36"
-serde = "1.0"
-serde_derive = "1.0"
-serde_json = "1.0"
+serde = "1.0.105"
+serde_derive = "1.0.105"
+serde_json = "1.0.50"
 surf = { git = "https://github.com/rustasync/surf" }
 tide = {git="https://github.com/rustasync/tide"}
-toml = "0.5"
-base64 = "0.10.1"
+toml = "0.5.6"
+base64 = "0.12.0"
