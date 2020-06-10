@@ -19,7 +19,7 @@ rand = "0.7.3"
 rust-crypto = "0.2.36"
 serde = "1.0.111"
 serde_derive = "1.0.105"
-serde_json = "1.0.53"
+serde_json = "1.0.55"
 surf = { git = "https://github.com/rustasync/surf" }
 tide = {git="https://github.com/rustasync/tide"}
 toml = "0.5.6"
