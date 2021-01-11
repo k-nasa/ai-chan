@@ -17,7 +17,7 @@ dependencies = [
  "base64 0.12.3",
  "dirs",
  "failure",
- "log 0.4.11",
+ "log 0.4.13",
  "pretty_env_logger",
  "rand 0.7.3",
  "rust-crypto",
@@ -58,7 +58,7 @@ dependencies = [
  "futures-io",
  "futures-timer",
  "kv-log-macro",
- "log 0.4.11",
+ "log 0.4.13",
  "memchr",
  "mio",
  "mio-uds",
@@ -387,7 +387,7 @@ checksum = "44533bbbb3bb3c1fa17d9f2e4e38bbbaf8396ba82193c4cb1b6445d711445d36"
 dependencies = [
  "atty",
  "humantime",
- "log 0.4.11",
+ "log 0.4.13",
  "regex",
  "termcolor",
 ]
@@ -585,7 +585,7 @@ dependencies = [
  "futures",
  "http",
  "indexmap",
- "log 0.4.11",
+ "log 0.4.13",
  "slab",
  "string",
  "tokio-io",
@@ -685,7 +685,7 @@ dependencies = [
  "httparse",
  "iovec",
  "itoa",
- "log 0.4.11",
+ "log 0.4.13",
  "net2",
  "rustc_version",
  "time",
@@ -755,7 +755,7 @@ dependencies = [
  "futures-util-preview",
  "http",
  "lazy_static",
- "log 0.4.11",
+ "log 0.4.13",
  "slab",
  "sluice",
 ]
@@ -791,7 +791,7 @@ version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8c54d9f465d530a752e6ebdc217e081a7a614b48cb200f6f0aee21ba6bc9aabb"
 dependencies = [
- "log 0.4.11",
+ "log 0.4.13",
 ]
 
 [[package]]
@@ -843,14 +843,14 @@ version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e19e8d5c34a3e0e2223db8e060f9e8264aeeb5c5fc64a4ee9965c062211c024b"
 dependencies = [
- "log 0.4.11",
+ "log 0.4.13",
 ]
 
 [[package]]
 name = "log"
-version = "0.4.11"
+version = "0.4.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4fabed175da42fed1fa0746b0ea71f412aa9d35e76e95e59b192c64b9dc2bf8b"
+checksum = "fcf3805d4480bb5b86070dcfeb9e2cb2ebc148adb753c5cca5f884d1d65a42b2"
 dependencies = [
  "cfg-if",
 ]
@@ -930,7 +930,7 @@ dependencies = [
  "iovec",
  "kernel32-sys",
  "libc",
- "log 0.4.11",
+ "log 0.4.13",
  "miow",
  "net2",
  "slab",
@@ -968,7 +968,7 @@ checksum = "136eed74cadb9edd2651ffba732b19a450316b680e4f48d6c79e905799e19d01"
 dependencies = [
  "buf_redux",
  "httparse",
- "log 0.4.11",
+ "log 0.4.13",
  "mime 0.2.6",
  "mime_guess 1.8.7",
  "quick-error",
@@ -1148,7 +1148,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "926d36b9553851b8b0005f1275891b392ee4d2d833852c417ed025477350fb9d"
 dependencies = [
  "env_logger",
- "log 0.4.11",
+ "log 0.4.13",
 ]
 
 [[package]]
@@ -1613,7 +1613,7 @@ dependencies = [
  "http",
  "isahc",
  "js-sys",
- "log 0.4.11",
+ "log 0.4.13",
  "mime 0.3.14",
  "mime_guess 2.0.1",
  "serde",
@@ -1744,7 +1744,7 @@ dependencies = [
  "futures-preview",
  "http",
  "http-service",
- "log 0.4.11",
+ "log 0.4.13",
  "multipart",
  "serde",
  "serde_urlencoded",
@@ -1758,7 +1758,7 @@ source = "git+https://github.com/rustasync/tide#e77709370bb24cf776fe6da902467c35
 dependencies = [
  "futures-preview",
  "http",
- "log 0.4.11",
+ "log 0.4.13",
  "tide-core",
 ]
 
@@ -1769,7 +1769,7 @@ source = "git+https://github.com/rustasync/tide#e77709370bb24cf776fe6da902467c35
 dependencies = [
  "futures-preview",
  "http",
- "log 0.4.11",
+ "log 0.4.13",
  "tide-core",
 ]
 
@@ -1780,7 +1780,7 @@ source = "git+https://github.com/rustasync/tide#e77709370bb24cf776fe6da902467c35
 dependencies = [
  "futures-preview",
  "http",
- "log 0.4.11",
+ "log 0.4.13",
  "serde",
  "serde_qs",
  "tide-core",
@@ -1854,7 +1854,7 @@ checksum = "5090db468dad16e1a7a54c8c67280c5e4b544f3d3e018f0b913b400261f85926"
 dependencies = [
  "bytes",
  "futures",
- "log 0.4.11",
+ "log 0.4.13",
 ]
 
 [[package]]
@@ -1866,7 +1866,7 @@ dependencies = [
  "crossbeam-utils 0.6.6",
  "futures",
  "lazy_static",
- "log 0.4.11",
+ "log 0.4.13",
  "mio",
  "num_cpus",
  "parking_lot",
@@ -1911,7 +1911,7 @@ dependencies = [
  "crossbeam-utils 0.6.6",
  "futures",
  "lazy_static",
- "log 0.4.11",
+ "log 0.4.13",
  "num_cpus",
  "slab",
  "tokio-executor",
@@ -2042,7 +2042,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6395efa4784b027708f7451087e647ec73cc74f5d9bc2e418404248d679a230"
 dependencies = [
  "futures",
- "log 0.4.11",
+ "log 0.4.13",
  "try-lock",
 ]
 
@@ -2070,7 +2070,7 @@ checksum = "927196b315c23eed2748442ba675a4c54a1a079d90d9bdc5ad16ce31cf90b15b"
 dependencies = [
  "bumpalo",
  "lazy_static",
- "log 0.4.11",
+ "log 0.4.13",
  "proc-macro2",
  "quote",
  "syn",
@@ -2130,7 +2130,7 @@ checksum = "9b979afb0535fe4749906a674082db1211de8aef466331d43232f63accb7c07c"
 dependencies = [
  "failure",
  "heck",
- "log 0.4.11",
+ "log 0.4.13",
  "proc-macro2",
  "quote",
  "syn",
